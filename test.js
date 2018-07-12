@@ -99,6 +99,13 @@ const sendPong = function(channelForResponse){
 	returnToResponseChannel(channelForResponse,'pong','Pong! Device '+deviceId+' is online!');
 }
 
+// PUSHER : log
+const sendLog = function(channelForResponse){
+	fs.readFile('/home/pi/skipq/logs/'+currentTime+'.log', {encoding: 'utf-8'}, function(err,data){
+		returnToResponseChannel(channelForResponse,'log',data);
+	});
+}
+
 
 // PUSHER : print
 const printOrder = function(name, printTaskId, base64Ticket){
@@ -155,6 +162,14 @@ const pusherListener = function(channel){
 			break;
 			case 'list_order_tickets':
 				listOrderTickets(data.channelForResponse);
+			break;
+			case 'send_log':
+				sendLog(data.channelForResponse);
+			break;
+			case 'reboot':
+				shell.exec("reboot", function(error, stdout, stderr) {
+					process.exit();
+				});
 			break;
 			default:
 		}
