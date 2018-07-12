@@ -1,0 +1,12 @@
+{ message: 'not internet connection. Retry in 10 seconds.....',
+  level: 'info',
+  timestamp: '2018-07-12T13:38:50.666Z' }
+{ message: 'Init for 173',
+  level: 'info',
+  timestamp: '2018-07-12T13:38:55.841Z' }
+{ message: 'Printer status : idle\n',
+  level: 'info',
+  timestamp: '2018-07-12T13:38:56.205Z' }
+{ message: 'not internet connection. Retry in 10 seconds.....',
+  level: 'info',
+  timestamp: '2018-07-12T13:39:15.567Z' }

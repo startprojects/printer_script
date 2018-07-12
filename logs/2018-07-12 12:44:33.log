@@ -1,0 +1,27 @@
+{ message: 'Init for 173',
+  level: 'info',
+  timestamp: '2018-07-12T12:44:38.959Z' }
+{ message: 'Printer status : idle\n',
+  level: 'info',
+  timestamp: '2018-07-12T12:44:40.912Z' }
+{ message: 'Printer status : idle\n',
+  level: 'info',
+  timestamp: '2018-07-12T12:45:57.625Z' }
+{ message: 'Printer status : idle\n',
+  level: 'info',
+  timestamp: '2018-07-12T12:46:57.628Z' }
+{ message: 'Printer status : idle\n',
+  level: 'info',
+  timestamp: '2018-07-12T12:47:57.749Z' }
+{ message: 'Printer status : idle\n',
+  level: 'info',
+  timestamp: '2018-07-12T12:48:57.771Z' }
+{ message: 'Printer status : idle\n',
+  level: 'info',
+  timestamp: '2018-07-12T12:49:57.813Z' }
+{ message: 'Printer status : idle\n',
+  level: 'info',
+  timestamp: '2018-07-12T12:50:57.896Z' }
+{ message: 'Printer status : idle\n',
+  level: 'info',
+  timestamp: '2018-07-12T12:51:58.372Z' }

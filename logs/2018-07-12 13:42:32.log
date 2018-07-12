@@ -1,0 +1,6 @@
+{ message: 'Init for 173',
+  level: 'info',
+  timestamp: '2018-07-12T13:42:42.354Z' }
+{ message: 'Printer status : idle\n',
+  level: 'info',
+  timestamp: '2018-07-12T13:42:42.718Z' }

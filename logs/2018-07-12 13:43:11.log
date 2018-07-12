@@ -1,0 +1,36 @@
+{ message: 'not internet connection. Retry in 10 seconds.....',
+  level: 'info',
+  timestamp: '2018-07-12T13:43:21.769Z' }
+{ message: 'not internet connection. Retry in 10 seconds.....',
+  level: 'info',
+  timestamp: '2018-07-12T13:43:31.703Z' }
+{ message: 'not internet connection. Retry in 10 seconds.....',
+  level: 'info',
+  timestamp: '2018-07-12T13:43:41.711Z' }
+{ message: 'not internet connection. Retry in 10 seconds.....',
+  level: 'info',
+  timestamp: '2018-07-12T13:43:51.724Z' }
+{ message: 'not internet connection. Retry in 10 seconds.....',
+  level: 'info',
+  timestamp: '2018-07-12T13:44:01.734Z' }
+{ message: 'not internet connection. Retry in 10 seconds.....',
+  level: 'info',
+  timestamp: '2018-07-12T13:44:11.743Z' }
+{ message: 'not internet connection. Retry in 10 seconds.....',
+  level: 'info',
+  timestamp: '2018-07-12T13:44:21.754Z' }
+{ message: 'not internet connection. Retry in 10 seconds.....',
+  level: 'info',
+  timestamp: '2018-07-12T13:44:31.766Z' }
+{ message: 'not internet connection. Retry in 10 seconds.....',
+  level: 'info',
+  timestamp: '2018-07-12T13:44:41.776Z' }
+{ message: 'not internet connection. Retry in 10 seconds.....',
+  level: 'info',
+  timestamp: '2018-07-12T13:44:51.786Z' }
+{ message: 'Init for 173',
+  level: 'info',
+  timestamp: '2018-07-12T13:45:01.866Z' }
+{ message: 'Printer status : idle\n',
+  level: 'info',
+  timestamp: '2018-07-12T13:45:02.255Z' }
