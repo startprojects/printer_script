@@ -36,18 +36,6 @@ const logger = {
         console.log(`${currentTime} ${level}: ${text}`);
     }
 };
-// const logger = winston.createLogger({
-// 	format: winston.format.combine(
-// 	    winston.format.timestamp(),
-// 	    winston.format.printf(info => {
-// 		  return `${info.timestamp} ${info.level}: ${info.message}`;
-// 		})
-// 	),
-// 	transports:[
-// 		new winston.transports.Console(),
-// 		new winston.transports.File({filename:'/home/pi/skipq/logs/'+currentTime+'.log'}),
-// 	]
-// });
 
 // convert string to file
 const getFileFromBase64 = function (path, base64, promise) {
@@ -73,7 +61,7 @@ const returnToResponseChannel = function (channelForResponse, type, message) {
 
 // get the result of the prinr
 const getPrintResult = function (printReference, callback) {
-    shell.exec('./test-print.sh "' + printReference + '"',
+    shell.exec('./bash_service/test-print.sh "' + printReference + '"',
         (error, stdout, stderr) => {
             const status = stdout.replace('\n', '');
             logger.info('Status for ' + printReference + ' : ' + status);
@@ -124,7 +112,7 @@ const sendLog = function (channelForResponse) {
 // PUSHER : print
 const printOrder = function (name, printTaskId, base64Ticket) {
     const time = dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss');
-    const fileName = './' + TICKETS_FOLDER_NAME + '/' + name + ' - ' + time + '.pdf';
+    const fileName = '/home/pi/skipq/' + TICKETS_FOLDER_NAME + '/' + name + ' - ' + time + '.pdf';
     logger.info('Try to print order  ' + fileName);
     getFileFromBase64(fileName, base64Ticket, () => {
         print(fileName, (printReference) => {
@@ -153,7 +141,7 @@ const printOrder = function (name, printTaskId, base64Ticket) {
 
 // PUSH : list order tickets
 const listOrderTickets = function (channelForResponse) {
-    shell.exec('ls -1 ./' + TICKETS_FOLDER_NAME,
+    shell.exec('ls -1 /home/pi/skipq/' + TICKETS_FOLDER_NAME,
         (error, stdout, stderr) => {
             returnToResponseChannel(channelForResponse, 'list ticket', stdout.replace(new RegExp('\n', 'g'), '<br/>'));
         });
@@ -215,7 +203,7 @@ const sendStatus = function (deviceId, status) {
 
 // refresh the printer status
 const refreshPrinterStatus = function (deviceId) {
-    shell.exec('./test-printer.sh',
+    shell.exec('./bash_service/test-printer.sh',
         (error, stdout, stderr) => {
             const status = stdout.replace('\n', '');
             logger.info('Printer status : ' + status);
