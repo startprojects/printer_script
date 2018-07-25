@@ -22,16 +22,7 @@ GIT_FOLDER_PATH="$FOLDER_PATH.git"
 DATE=`date '+%Y-%m-%d %H:%M:%S'`
 
 # need git update ?
-# compare the commit id from local and origin repo
-ORIGIN_COMMIT_ID="$(git --git-dir $GIT_FOLDER_PATH rev-parse origin/master)"
-LOCAL_COMMIT_ID="$(git --git-dir $GIT_FOLDER_PATH rev-parse HEAD)"
-
-if [ "$ORIGIN_COMMIT_ID" != "$LOCAL_COMMIT_ID" ];then
-	git $GIT_FOLDER_PATH pull
-	echo "GIT REPO REFRESHED"
-else
-    echo "GIT REPO UP TO DATE"
-fi
+git  --git-dir $GIT_FOLDER_PATH pull
 
 LOG_PATH="${FOLDER_PATH}logs/$DATE.log"
 echo "Start script with log $LOG_PATH"
