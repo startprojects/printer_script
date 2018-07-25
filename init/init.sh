@@ -18,17 +18,17 @@
 ###
 
 FOLDER_PATH=/home/pi/skipq/
-GIT_FOLDER_PATH="$FOLDER_PATH.git"
+SCRIPT_FOLDER_PATH="${FOLDER_PATH}script/"
+GIT_SCRIPT_FOLDER_PATH="$SCRIPT_FOLDER_PATH.git"
 DATE=`date '+%Y-%m-%d %H:%M:%S'`
 
 # need git update ?
-git  --git-dir $GIT_FOLDER_PATH pull
+git  --git-dir $GIT_SCRIPT_FOLDER_PATH pull
 
 LOG_PATH="${FOLDER_PATH}logs/$DATE.log"
 echo "Start script with log $LOG_PATH"
 sudo touch "$LOG_PATH"
 sudo chmod 777 "$LOG_PATH"
 node "$FOLDER_PATH/mainScript.js" > "$LOG_PATH"
-
 
 exit 0
