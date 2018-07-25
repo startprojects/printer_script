@@ -261,6 +261,12 @@ const starterInterval = setInterval(function () {
     });
 }, 10 * 1000);
 
+// check connection
+const checkConnection = setInterval(function () {
+    console.log('checkConnection');
+    console.log(pusherSocket);
+}, 1 * 1000);
+
 
 
 
