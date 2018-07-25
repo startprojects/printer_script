@@ -4,6 +4,7 @@ const PUSHER_PUBLIC_KEY = 'da1aeba7cb6efed85f57';
 const PUSHER_CLUSTER = 'eu';
 const SERVER_DOMAIN = 'https://business.skip-q.com';
 const TICKETS_FOLDER_NAME = 'ticketToPrint';
+const LOGS_FOLDER_NAME = 'logs';
 
 const fs = require('fs');
 const path = require('path');
@@ -48,16 +49,17 @@ const getFileFromBase64 = function (path, base64, promise) {
 };
 
 // return info to the specified channel
-const returnToResponseChannel = function (channelForResponse, type, message) {
+const returnToResponseChannel = function (channelForResponse, type, message, params) {
     const responseChannel = pusherSocket.subscribe(channelForResponse);
     // wait 1 second to subscription
     // TODO optimize ?
+    if (!params)
+        params = {};
+    params.device = deviceId;
+    params.type = type;
+    params.message = message;
     setTimeout(() => {
-        responseChannel.trigger('client-main', {
-            device: deviceId,
-            type: type,
-            message: message,
-        });
+        responseChannel.trigger('client-main', params);
     }, 1000);
 };
 
@@ -100,15 +102,27 @@ const print = function (fileName, callback) {
 
 // PUSHER : pong
 const sendPong = function (channelForResponse) {
-    returnToResponseChannel(channelForResponse, 'pong', 'Pong! Device ' + deviceId + ' is online!');
+    returnToResponseChannel(channelForResponse, 'pong', 'Pong! Device ' + deviceId + ' is online!', {
+        deviceId
+    });
 };
 
 // PUSHER : log
-const sendLog = function (channelForResponse) {
-    // TODO
-    // fs.readFile(SKIPQ_FOLDER + 'logs/' + currentTime + '.log', {encoding: 'utf-8'}, function (err, data) {
-    //     returnToResponseChannel(channelForResponse, 'log', data);
-    // });
+const sendLog = function (channelForResponse, logName) {
+    fs.readFile(SKIPQ_FOLDER + LOGS_FOLDER_NAME + '/' + logName, {encoding: 'utf-8'}, function (err, data) {
+        returnToResponseChannel(channelForResponse, 'log', data);
+    });
+};
+
+// PUSHER : list of logs
+const sendLogs = function (channelForResponse) {
+    shell.exec('ls -1 ' + SKIPQ_FOLDER + LOGS_FOLDER_NAME,
+        (error, stdout, stderr) => {
+            const arr = stdout.split(stdout);
+            returnToResponseChannel(channelForResponse, 'list logs', 'list', {
+                logs: arr,
+            });
+        });
 };
 
 
@@ -168,8 +182,11 @@ const pusherListener = function (channel) {
             case 'list_order_tickets':
                 listOrderTickets(data.channelForResponse);
                 break;
+            case 'send_logs':
+                sendLogs(data.channelForResponse);
+                break;
             case 'send_log':
-                sendLog(data.channelForResponse);
+                sendLog(data.channelForResponse, data.logName);
                 break;
             case 'reboot':
                 shell.exec("reboot", function (error, stdout, stderr) {
@@ -184,7 +201,7 @@ const pusherListener = function (channel) {
 // return the device id
 const getDeviceId = function () {
     const bodyJson = fs.readFileSync(path.resolve(__dirname, 'device.json'));
-    body = JSON.parse(bodyJson);
+    const body = JSON.parse(bodyJson);
     return body.id;
 };
 
@@ -238,12 +255,13 @@ const init = function () {
     clientChannel = pusherSocket.subscribe('private-printers');
 
     // add event when connection status change
-    pusherSocket.connection.bind('state_change', function(states){
-        logger.warn('pusher connection status changes from '+states.previous+' to '+states.current);
+    pusherSocket.connection.bind('state_change', function (states) {
+        logger.warn('pusher connection status changes from ' + states.previous + ' to ' + states.current);
     });
 
-    // add listener to channels
-    pusherListener(personalChannel, clientChannel);
+    // add listeners to channels
+    pusherListener(personalChannel);
+    pusherListener(clientChannel);
 
     // refresh printer status every 10 minutes
     refreshPrinterStatus(deviceId);
