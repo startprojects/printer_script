@@ -11,12 +11,13 @@
 # /home/pi/skipq/script : the git repo that should be executed. Should contains at least the mainScript.js file
 ####
 
-
-# add the ssh key :
-# run ssh-agent in background
-eval "$(ssh-agent -s)"
-# add the ssh key
-ssh-add /home/pi/skipq/rsa
+# SD card config : 
+# 1. add rsa and rsa.pub into /home/pi/skipq
+# 2. add into /home/pi/.ssh/config : 
+# Host github.com
+# User florianjeanmart
+# IdentityFile = /home/pi/skipq/rsa
+# 3. replace /etc/rc.local by init.sh
 
 # clone the repo then switch to the branch
 git clone git@github.com:SkipQ/printer_script.git /home/pi/skipq/script
