@@ -1,4 +1,5 @@
 // CONSTANTS
+const SKIPQ_FOLDER = '/home/pi/skipq/script/';
 const PUSHER_PUBLIC_KEY = 'da1aeba7cb6efed85f57';
 const PUSHER_CLUSTER = 'eu';
 const SERVER_DOMAIN = 'https://business.skip-q.com';
@@ -61,7 +62,7 @@ const returnToResponseChannel = function (channelForResponse, type, message) {
 
 // get the result of the prinr
 const getPrintResult = function (printReference, callback) {
-    shell.exec('./bash_service/test-print.sh "' + printReference + '"',
+    shell.exec(SKIPQ_FOLDER + 'script/bash_service/test-print.sh "' + printReference + '"',
         (error, stdout, stderr) => {
             const status = stdout.replace('\n', '');
             logger.info('Status for ' + printReference + ' : ' + status);
@@ -98,12 +99,12 @@ const print = function (fileName, callback) {
 
 // PUSHER : pong
 const sendPong = function (channelForResponse) {
-    returnToResponseChannel(channelForResponse, 'pong', 'Pong! Device ' + deviceId + ' is online!');
+    returnToResponseChannel(channelForResponse, 'pong', 'Pong! Device ' + deviceId + ' is online');
 };
 
 // PUSHER : log
 const sendLog = function (channelForResponse) {
-    fs.readFile('/home/pi/skipq/logs/' + currentTime + '.log', {encoding: 'utf-8'}, function (err, data) {
+    fs.readFile(SKIPQ_FOLDER + 'logs/' + currentTime + '.log', {encoding: 'utf-8'}, function (err, data) {
         returnToResponseChannel(channelForResponse, 'log', data);
     });
 };
@@ -112,7 +113,7 @@ const sendLog = function (channelForResponse) {
 // PUSHER : print
 const printOrder = function (name, printTaskId, base64Ticket) {
     const time = dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss');
-    const fileName = '/home/pi/skipq/' + TICKETS_FOLDER_NAME + '/' + name + ' - ' + time + '.pdf';
+    const fileName = SKIPQ_FOLDER + TICKETS_FOLDER_NAME + '/' + name + ' - ' + time + '.pdf';
     logger.info('Try to print order  ' + fileName);
     getFileFromBase64(fileName, base64Ticket, () => {
         print(fileName, (printReference) => {
@@ -141,7 +142,7 @@ const printOrder = function (name, printTaskId, base64Ticket) {
 
 // PUSH : list order tickets
 const listOrderTickets = function (channelForResponse) {
-    shell.exec('ls -1 /home/pi/skipq/' + TICKETS_FOLDER_NAME,
+    shell.exec('ls -1 ' + SKIPQ_FOLDER + TICKETS_FOLDER_NAME,
         (error, stdout, stderr) => {
             returnToResponseChannel(channelForResponse, 'list ticket', stdout.replace(new RegExp('\n', 'g'), '<br/>'));
         });
@@ -203,7 +204,7 @@ const sendStatus = function (deviceId, status) {
 
 // refresh the printer status
 const refreshPrinterStatus = function (deviceId) {
-    shell.exec('./bash_service/test-printer.sh',
+    shell.exec(SKIPQ_FOLDER + 'script/bash_service/test-printer.sh',
         (error, stdout, stderr) => {
             const status = stdout.replace('\n', '');
             logger.info('Printer status : ' + status);
