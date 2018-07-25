@@ -62,7 +62,7 @@ const returnToResponseChannel = function (channelForResponse, type, message) {
 
 // get the result of the prinr
 const getPrintResult = function (printReference, callback) {
-    shell.exec(SKIPQ_FOLDER + 'script/bash_service/test-print.sh "' + printReference + '"',
+    shell.exec(SKIPQ_FOLDER + 'bash_service/test-print.sh "' + printReference + '"',
         (error, stdout, stderr) => {
             const status = stdout.replace('\n', '');
             logger.info('Status for ' + printReference + ' : ' + status);
@@ -204,7 +204,7 @@ const sendStatus = function (deviceId, status) {
 
 // refresh the printer status
 const refreshPrinterStatus = function (deviceId) {
-    shell.exec(SKIPQ_FOLDER + 'script/bash_service/test-printer.sh',
+    shell.exec(SKIPQ_FOLDER + 'bash_service/test-printer.sh',
         (error, stdout, stderr) => {
             const status = stdout.replace('\n', '');
             logger.info('Printer status : ' + status);
