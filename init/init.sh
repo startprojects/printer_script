@@ -22,6 +22,9 @@ SCRIPT_FOLDER_PATH="${FOLDER_PATH}script/"
 GIT_SCRIPT_FOLDER_PATH="$SCRIPT_FOLDER_PATH.git"
 DATE=`date '+%Y-%m-%d %H:%M:%S'`
 
+# add SSH key for github
+ssh-add /home/pi/skipq/rsa
+
 # need git update ?
 git  --git-dir $GIT_SCRIPT_FOLDER_PATH pull
 
