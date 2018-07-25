@@ -99,7 +99,7 @@ const print = function (fileName, callback) {
 
 // PUSHER : pong
 const sendPong = function (channelForResponse) {
-    returnToResponseChannel(channelForResponse, 'pong', 'Pong! Device ' + deviceId + ' is online !!! :!');
+    returnToResponseChannel(channelForResponse, 'pong', 'Pong! Device ' + deviceId + ' is online !!! 3');
 };
 
 // PUSHER : log
