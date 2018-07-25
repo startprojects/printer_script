@@ -10,7 +10,8 @@ const path = require('path');
 // const winston = require('winston');
 const request = require('request');
 const shell = require('shelljs');
-const Pusher = require('pusher-client');
+// const Pusher = require('pusher-client');
+const Pusher = require('pusher-js');
 const dateFormat = require('dateformat');
 const dns = require('dns');
 
@@ -48,7 +49,7 @@ const getFileFromBase64 = function (path, base64, promise) {
 
 // return info to the specified channel
 const returnToResponseChannel = function (channelForResponse, type, message) {
-    const responseChannel = pusher.subscribe(channelForResponse);
+    const responseChannel = pusherSocket.subscribe(channelForResponse);
     // wait 1 second to subscription
     // TODO optimize ?
     setTimeout(() => {
@@ -99,14 +100,15 @@ const print = function (fileName, callback) {
 
 // PUSHER : pong
 const sendPong = function (channelForResponse) {
-    returnToResponseChannel(channelForResponse, 'pong', 'Pong! Device ' + deviceId + ' is online !!! 6');
+    returnToResponseChannel(channelForResponse, 'pong', 'Pong! Device ' + deviceId + ' is online!');
 };
 
 // PUSHER : log
 const sendLog = function (channelForResponse) {
-    fs.readFile(SKIPQ_FOLDER + 'logs/' + currentTime + '.log', {encoding: 'utf-8'}, function (err, data) {
-        returnToResponseChannel(channelForResponse, 'log', data);
-    });
+    // TODO
+    // fs.readFile(SKIPQ_FOLDER + 'logs/' + currentTime + '.log', {encoding: 'utf-8'}, function (err, data) {
+    //     returnToResponseChannel(channelForResponse, 'log', data);
+    // });
 };
 
 
@@ -215,7 +217,7 @@ const refreshPrinterStatus = function (deviceId) {
 // variable
 let personalChannel;
 let clientChannel;
-let pusher;
+let pusherSocket;
 // load and store the device Id
 const deviceId = getDeviceId();
 
@@ -225,15 +227,15 @@ const init = function () {
     logger.info('Init for ' + deviceId);
 
     // PUSHER : authentication
-    pusher = new Pusher(PUSHER_PUBLIC_KEY, {
+    pusherSocket = new Pusher(PUSHER_PUBLIC_KEY, {
         cluster: PUSHER_CLUSTER,
         encrypted: true,
         authEndpoint: SERVER_DOMAIN + '/pusher/auth'
     });
 
     // subscribe to pusher channel
-    personalChannel = pusher.subscribe('private-printer-' + deviceId);
-    clientChannel = pusher.subscribe('private-printers');
+    personalChannel = pusherSocket.subscribe('private-printer-' + deviceId);
+    clientChannel = pusherSocket.subscribe('private-printers');
 
     // add listener to channels
     pusherListener(personalChannel, clientChannel);
@@ -250,6 +252,7 @@ const starterInterval = setInterval(function () {
     testInternetConnection((isInternetAvailable) => {
         if (isInternetAvailable) {
             init();
+            console.log(pusherSocket);
             clearInterval(starterInterval);
         }
         else {
