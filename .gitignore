@@ -103,6 +103,3 @@ nb-configuration.xml
 database_backups/
 .last_values
 
-/velocity.log
-cart.sql
-export_table.sql
