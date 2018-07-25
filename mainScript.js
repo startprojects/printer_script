@@ -237,10 +237,15 @@ const init = function () {
     personalChannel = pusherSocket.subscribe('private-printer-' + deviceId);
     clientChannel = pusherSocket.subscribe('private-printers');
 
+    // add event when connection status change
+    pusherSocket.connection.bind('state_change', function(states){
+        logger.warn('pusher connection status changes from '+states.previous+' to '+states.current);
+    });
+
     // add listener to channels
     pusherListener(personalChannel, clientChannel);
 
-    // refresh printer status every 1 minutes
+    // refresh printer status every 10 minutes
     refreshPrinterStatus(deviceId);
     setInterval(function () {
         refreshPrinterStatus(deviceId);
@@ -252,7 +257,6 @@ const starterInterval = setInterval(function () {
     testInternetConnection((isInternetAvailable) => {
         if (isInternetAvailable) {
             init();
-            console.log(pusherSocket);
             clearInterval(starterInterval);
         }
         else {
@@ -262,11 +266,24 @@ const starterInterval = setInterval(function () {
 }, 10 * 1000);
 
 // check connection
+/*
 const checkConnection = setInterval(function () {
-    console.log('checkConnection');
-    console.log(pusherSocket);
-}, 1 * 1000);
-
+	if(pusherSocket){
+	    const state = pusherSocket.connection.state;
+		logger.info('pusher connection state : '+state);
+		if(state === 'failed' || state === 'unavailable' || state === 'disconnected'){
+			testInternetConnection((isInternetAvailable) => {
+				if(isInternetAvailable){
+					logger.error('error with pusher connection. State is : '+state);
+				}
+				else{
+					logger.error('No internet connection.');
+				}
+			});
+		}
+	}
+}, 5 * 1000);
+*/
 
 
 
