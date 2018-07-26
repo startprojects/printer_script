@@ -17,7 +17,12 @@
 # 2. launch the js script with node and print the result into a log
 ###
 
-sleep 10
+# configure the log for the file
+exec 2> /tmp/rc.local.log
+exec 1>&2
+set -x
+
+sleep 30
 
 FOLDER_PATH=/home/pi/skipq/
 SCRIPT_FOLDER_PATH=/home/pi/skipq/script/
