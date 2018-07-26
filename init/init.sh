@@ -1,6 +1,6 @@
 #!/bin/sh -e
 #
-# /etc/rc.local
+# rc.local
 #
 # This script is executed at the end of each multiuser runlevel.
 # Make sure that the script will "exit 0" on success or any other
@@ -17,21 +17,21 @@
 # 2. launch the js script with node and print the result into a log
 ###
 
+sleep 10
+
 FOLDER_PATH=/home/pi/skipq/
-SCRIPT_FOLDER_PATH="${FOLDER_PATH}script/"
+SCRIPT_FOLDER_PATH=/home/pi/skipq/script/
 GIT_SCRIPT_FOLDER_PATH="$SCRIPT_FOLDER_PATH.git"
 DATE=`date '+%Y-%m-%d %H:%M:%S'`
 
-# add SSH key for github
-ssh-add /home/pi/skipq/rsa
-
 # need git update ?
-git  --git-dir $GIT_SCRIPT_FOLDER_PATH pull
+sudo su -l pi -c "cd /home/pi/skipq/script/ && git pull"
 
 LOG_PATH="${FOLDER_PATH}logs/$DATE.log"
 echo "Start script with log $LOG_PATH"
 sudo touch "$LOG_PATH"
 sudo chmod 777 "$LOG_PATH"
 node "$SCRIPT_FOLDER_PATH/mainScript.js" > "$LOG_PATH"
+
 
 exit 0
