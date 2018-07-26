@@ -111,6 +111,7 @@ const sendPong = function (type, channelForResponse) {
 
 // PUSHER : log
 const sendLog = function (channelForResponse, logName) {
+    logger.info('send log '+logName+' to '+channelForResponse);
     fs.readFile(SKIPQ_FOLDER + LOGS_FOLDER_NAME + '/' + logName, {encoding: 'utf-8'}, function (err, data) {
         returnToResponseChannel(channelForResponse, 'log', data);
     });
