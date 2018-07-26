@@ -16,6 +16,7 @@ const shell = require('shelljs');
 const Pusher = require('pusher-js');
 const dateFormat = require('dateformat');
 const dns = require('dns');
+const _ = require('underscore');
 
 // test internet connection
 const testInternetConnection = function (callback) {
@@ -102,7 +103,7 @@ const print = function (fileName, callback) {
 };
 
 // PUSHER : pong
-const sendPong = function (type,channelForResponse) {
+const sendPong = function (type, channelForResponse) {
     returnToResponseChannel(channelForResponse, type, 'Pong! Device ' + deviceId + ' is online!', {
         deviceId
     });
@@ -118,8 +119,10 @@ const sendLog = function (channelForResponse, logName) {
 // PUSHER : list of logs
 const sendLogs = function (channelForResponse) {
     shell.exec('ls -1 ' + SKIPQ_FOLDER + LOGS_FOLDER_NAME,
-        (error, stdout, stderr) => {
-            const arr = stdout.split("\n");
+        (error, stdout) => {
+            const arr = _.filter(stdout.split("\n"), (name) => {
+                return name && name.length > 2;
+            });
             returnToResponseChannel(channelForResponse, 'list logs', 'list', {
                 logs: arr,
             });
@@ -160,8 +163,10 @@ const printOrder = function (name, printTaskId, base64Ticket) {
 // PUSH : list order tickets
 const listOrderTickets = function (channelForResponse) {
     shell.exec('ls -1 ' + SKIPQ_FOLDER + TICKETS_FOLDER_NAME,
-        (error, stdout, stderr) => {
-            const arr = stdout.split("\n");
+        (error, stdout) => {
+            const arr = _.filter(stdout.split("\n"), (name) => {
+                return name && name.length > 2;
+            });
             returnToResponseChannel(channelForResponse, 'list_tickets', 'list', {
                 logs: arr,
             });
@@ -175,10 +180,10 @@ const pusherListener = function (channel) {
         logger.info('Main event received : ' + data.type);
         switch (data.type) {
             case 'ping':
-                sendPong('pong',data.channelForResponse);
+                sendPong('pong', data.channelForResponse);
                 break;
             case 'pingAll':
-                sendPong('pongAll',data.channelForResponse);
+                sendPong('pongAll', data.channelForResponse);
                 break;
             case 'print_order':
                 const printTaskId = data.printTaskId;
