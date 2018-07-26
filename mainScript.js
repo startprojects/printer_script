@@ -101,8 +101,8 @@ const print = function (fileName, callback) {
 };
 
 // PUSHER : pong
-const sendPong = function (channelForResponse) {
-    returnToResponseChannel(channelForResponse, 'pong', 'Pong! Device ' + deviceId + ' is online!', {
+const sendPong = function (type,channelForResponse) {
+    returnToResponseChannel(channelForResponse, type, 'Pong! Device ' + deviceId + ' is online!', {
         deviceId
     });
 };
@@ -171,7 +171,10 @@ const pusherListener = function (channel) {
         logger.info('Main event received : ' + data.type);
         switch (data.type) {
             case 'ping':
-                sendPong(data.channelForResponse);
+                sendPong('pong',data.channelForResponse);
+                break;
+            case 'pingAll':
+                sendPong('pongAll',data.channelForResponse);
                 break;
             case 'print_order':
                 const printTaskId = data.printTaskId;
