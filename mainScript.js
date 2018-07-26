@@ -119,7 +119,7 @@ const sendLog = function (channelForResponse, logName) {
 const sendLogs = function (channelForResponse) {
     shell.exec('ls -1 ' + SKIPQ_FOLDER + LOGS_FOLDER_NAME,
         (error, stdout, stderr) => {
-            const arr = stdout.split(stdout);
+            const arr = stdout.split("\n");
             returnToResponseChannel(channelForResponse, 'list logs', 'list', {
                 logs: arr,
             });
@@ -161,7 +161,10 @@ const printOrder = function (name, printTaskId, base64Ticket) {
 const listOrderTickets = function (channelForResponse) {
     shell.exec('ls -1 ' + SKIPQ_FOLDER + TICKETS_FOLDER_NAME,
         (error, stdout, stderr) => {
-            returnToResponseChannel(channelForResponse, 'list ticket', stdout.replace(new RegExp('\n', 'g'), '<br/>'));
+            const arr = stdout.split("\n");
+            returnToResponseChannel(channelForResponse, 'list_tickets', 'list', {
+                logs: arr,
+            });
         });
 };
 
