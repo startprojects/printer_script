@@ -174,6 +174,16 @@ const listOrderTickets = function (channelForResponse) {
         });
 };
 
+// PUSHER : send ticket in base64
+const sendTicket = function (channelForResponse, ticketName) {
+    const bitmap = fs.readFileSync(SKIPQ_FOLDER + TICKETS_FOLDER_NAME + '/' + ticketName);
+    const fileInBase64 = new Buffer(bitmap).toString('base64');
+    returnToResponseChannel(channelForResponse, 'send_ticket', 'list', {
+        file: fileInBase64,
+        fileName: ticketName,
+    });
+};
+
 
 // PUSHER : listeners
 const pusherListener = function (channel) {
@@ -194,6 +204,9 @@ const pusherListener = function (channel) {
                 break;
             case 'list_order_tickets':
                 listOrderTickets(data.channelForResponse);
+                break;
+            case 'send_ticket':
+                sendTicket(data.channelForResponse, data.ticketName);
                 break;
             case 'send_logs':
                 sendLogs(data.channelForResponse);
