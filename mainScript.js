@@ -8,6 +8,7 @@ const TICKETS_FOLDER_NAME = 'ticketToPrint';
 const LOGS_FOLDER_NAME = 'logs';
 
 const fs = require('fs');
+const rimraf = require('rimraf');
 const path = require('path');
 // const winston = require('winston');
 const request = require('request');
@@ -184,6 +185,35 @@ const sendTicket = function (channelForResponse, ticketName) {
     });
 };
 
+// clean logs and tickets
+const removeFileOldThanOneDay = function (folderPath) {
+    fs.readdir(folderPath, function (err, files) {
+        files.forEach(function (file) {
+            const filePath = folderPath+'/'+file;
+            fs.stat(filePath, function (err, stat) {
+                let endTime, now;
+                if (err) {
+                    return console.error(err);
+                }
+                now = new Date().getTime();
+                endTime = new Date(stat.ctime).getTime() + 24 * 60 * 60 * 1000;
+                if (now > endTime) {
+                    return rimraf(filePath, function (err) {
+                        if (err) {
+                            return console.error(err);
+                        }
+                        console.log('successfully deleted');
+                    });
+                }
+            });
+        });
+    });
+};
+const cleanComputer = function () {
+    removeFileOldThanOneDay(SKIPQ_FOLDER + TICKETS_FOLDER_NAME);
+    removeFileOldThanOneDay(SKIPQ_FOLDER + LOGS_FOLDER_NAME);
+};
+
 
 // PUSHER : listeners
 const pusherListener = function (channel) {
@@ -219,6 +249,9 @@ const pusherListener = function (channel) {
                     process.exit();
                 });
                 break;
+            case 'clean_useless_file':
+                cleanComputer();
+                break;
             default:
         }
     });
@@ -232,12 +265,13 @@ const getDeviceId = function () {
 };
 
 // send the status in parameter to the sever
-const sendStatus = function (deviceId, status) {
+const sendStatus = function (deviceId, status, koAvailable) {
     request({
         url: 'https://business.skip-q.com/api/printer/' + deviceId + '/status',
         method: 'PUT',
         json: {
             status: status,
+            koAvailable,
         }
     }, function (err, e, b) {
         if (err) {
@@ -249,11 +283,17 @@ const sendStatus = function (deviceId, status) {
 
 // refresh the printer status
 const refreshPrinterStatus = function (deviceId) {
-    shell.exec(SCRIPT_FOLDER + 'bash_service/test-printer.sh',
-        (error, stdout, stderr) => {
-            const status = stdout.replace('\n', '');
-            logger.info('Printer status : ' + status);
-            sendStatus(deviceId, status);
+    shell.exec('df -h /',
+        (error, stdout) => {
+            const myRegexp = /([^ ]+) +([^ ]+) +([^ ]+) +([^ ]+) +([^ ]+) \//g;
+            const match = myRegexp.exec(stdout);
+            const koAvailable = match[4];
+            shell.exec(SCRIPT_FOLDER + 'bash_service/test-printer.sh',
+                (error, stdout, stderr) => {
+                    const status = stdout.replace('\n', '');
+                    logger.info('Printer status : ' + status);
+                    sendStatus(deviceId, status, koAvailable);
+                });
         });
 };
 

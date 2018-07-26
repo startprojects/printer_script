@@ -20,7 +20,6 @@
 # configure the log for the file
 exec 2> /tmp/rc.local.log
 exec 1>&2
-set -x
 
 
 FOLDER_PATH=/home/pi/skipq/
@@ -33,7 +32,7 @@ counter=0
 while :;
 do
     is_internet_connection="$(ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null && echo ok || echo error)"
-    if [ $is_internet_connection == 'ok' ]
+    if [ $is_internet_connection = "ok" ]
     then
 		echo 'ok'
         break
