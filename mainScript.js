@@ -283,7 +283,7 @@ const sendStatus = function (deviceId, status, koAvailable) {
 
 // refresh the printer status
 const refreshPrinterStatus = function (deviceId) {
-    shell.exec('df -h /',
+    shell.exec('df /',
         (error, stdout) => {
             const myRegexp = /([^ ]+) +([^ ]+) +([^ ]+) +([^ ]+) +([^ ]+) \//g;
             const match = myRegexp.exec(stdout);
@@ -291,7 +291,7 @@ const refreshPrinterStatus = function (deviceId) {
             shell.exec(SCRIPT_FOLDER + 'bash_service/test-printer.sh',
                 (error, stdout, stderr) => {
                     const status = stdout.replace('\n', '');
-                    logger.info('Printer status : ' + status);
+                    logger.info('Printer status : ' + status+', koAvailable:'+koAvailable);
                     sendStatus(deviceId, status, koAvailable);
                 });
         });

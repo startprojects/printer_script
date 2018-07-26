@@ -18,8 +18,10 @@
 ###
 
 # configure the log for the file
+sudo rm /tmp/rc.local.log
 exec 2> /tmp/rc.local.log
 exec 1>&2
+set -x
 
 
 FOLDER_PATH=/home/pi/skipq/
