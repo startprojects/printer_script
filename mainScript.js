@@ -111,7 +111,7 @@ const sendPong = function (type, channelForResponse) {
 
 // PUSHER : log
 const sendLog = function (channelForResponse, logName) {
-    logger.info('send log '+logName+' to '+channelForResponse);
+    logger.info('send log ' + logName + ' to ' + channelForResponse);
     fs.readFile(SKIPQ_FOLDER + LOGS_FOLDER_NAME + '/' + logName, {encoding: 'utf-8'}, function (err, data) {
         returnToResponseChannel(channelForResponse, 'log', data);
     });
@@ -169,7 +169,7 @@ const listOrderTickets = function (channelForResponse) {
                 return name && name.length > 2;
             });
             returnToResponseChannel(channelForResponse, 'list_tickets', 'list', {
-                logs: arr,
+                tickets: arr,
             });
         });
 };
@@ -297,17 +297,25 @@ const init = function () {
 };
 
 // starter
-const starterInterval = setInterval(function () {
-    testInternetConnection((isInternetAvailable) => {
-        if (isInternetAvailable) {
-            init();
-            clearInterval(starterInterval);
-        }
-        else {
-            logger.info("not internet connection. Retry in 10 seconds.....");
-        }
-    });
-}, 10 * 1000);
+testInternetConnection((isInternetAvailable) => {
+    if (isInternetAvailable) {
+        init();
+    }
+    else {
+        // no internet connexion ? wait...
+        const starterInterval = setInterval(function () {
+            testInternetConnection((isInternetAvailable) => {
+                if (isInternetAvailable) {
+                    init();
+                    clearInterval(starterInterval);
+                }
+                else {
+                    logger.info("not internet connection. Retry in 10 seconds.....");
+                }
+            });
+        }, 10 * 1000);
+    }
+});
 
 // check connection
 /*

@@ -19,6 +19,9 @@
 # IdentityFile = /home/pi/skipq/rsa
 # 3. replace /etc/rc.local by init.sh
 
+# confirgure the timzone
+sudo timedatectl set-timezone Europe/Brussels
+
 # clone the repo then switch to the branch
 git clone git@github.com:SkipQ/printer_script.git /home/pi/skipq/script
 git --git-dir  /home/pi/skipq/script/.git fetch
