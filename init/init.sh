@@ -22,12 +22,29 @@ exec 2> /tmp/rc.local.log
 exec 1>&2
 set -x
 
-sleep 30
 
 FOLDER_PATH=/home/pi/skipq/
 SCRIPT_FOLDER_PATH=/home/pi/skipq/script/
 GIT_SCRIPT_FOLDER_PATH="$SCRIPT_FOLDER_PATH.git"
 DATE=`date '+%Y-%m-%d %H:%M:%S'`
+
+# test internet connexion
+counter=0
+while :;
+do
+    is_internet_connection="$(ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null && echo ok || echo error)"
+    if [ $is_internet_connection == 'ok' ]
+    then
+		echo 'ok'
+        break
+    else
+		counter=$((counter+1))
+		time=`date '+%Y-%m-%d %H:%M:%S'`
+		echo "failed at try $counter at $time"
+        sleep 10
+    fi
+done
+
 
 # need git update ?
 sudo su -l pi -c "cd /home/pi/skipq/script/ && git pull"
