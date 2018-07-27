@@ -1,7 +1,7 @@
 // CONSTANTS
 const SKIPQ_FOLDER = '/home/pi/skipq/';
 const SCRIPT_FOLDER = SKIPQ_FOLDER + 'script/';
-const PUSHER_PUBLIC_KEY = 'da1aeba7cb6efed85f57';
+const PUSHER_PUBLIC_KEY = '06ce1e8c960dc055e0d4';
 const PUSHER_CLUSTER = 'eu';
 const SERVER_DOMAIN = 'https://business.skip-q.com';
 const TICKETS_FOLDER_NAME = 'ticketToPrint';
