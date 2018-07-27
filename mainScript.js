@@ -309,7 +309,7 @@ let deviceId;
 // load the device id or register the printer
 if (!fs.existsSync(DEVICE_INFO_PATH)) {
     logger.info('device.json file not found : registre the device');
-    request(SERVER_DOMAIN + '/api/registerPrinter', function (error, response, body) {
+    request(SERVER_DOMAIN + '/api/registerNewPrinter', function (error, response, body) {
         if (!error && response.statusCode === 200) {
             fs.writeFileSync(DEVICE_INFO_PATH, body);
             deviceId = getDeviceId();
