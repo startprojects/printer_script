@@ -1,5 +1,6 @@
 // CONSTANTS
 const SKIPQ_FOLDER = '/home/pi/skipq/';
+const DEVICE_INFO_PATH = SKIPQ_FOLDER + 'device.json';
 const SCRIPT_FOLDER = SKIPQ_FOLDER + 'script/';
 const PUSHER_PUBLIC_KEY = '06ce1e8c960dc055e0d4';
 const PUSHER_CLUSTER = 'eu';
@@ -261,7 +262,7 @@ const pusherListener = function (channel) {
 
 // return the device id
 const getDeviceId = function () {
-    const bodyJson = fs.readFileSync(SKIPQ_FOLDER + 'device.json');
+    const bodyJson = fs.readFileSync(DEVICE_INFO_PATH);
     const body = JSON.parse(bodyJson);
     return body.id;
 };
@@ -303,8 +304,25 @@ const refreshPrinterStatus = function (deviceId) {
 let personalChannel;
 let clientChannel;
 let pusherSocket;
-// load and store the device Id
-const deviceId = getDeviceId();
+let deviceId;
+
+// load the device id or register the printer
+if (!fs.existsSync(DEVICE_INFO_PATH)) {
+    logger.info('device.json file not found : registre the device');
+    request(SERVER_DOMAIN + '/api/registerPrinter', function (error, response, body) {
+        if (!error && response.statusCode === 200) {
+            fs.writeFileSync(DEVICE_INFO_PATH, body);
+            deviceId = getDeviceId();
+            fs.writeFileSync('/home/pi/Desktop/PI-' + deviceId + '.txt', JSON.stringify(body));
+
+        } else {
+            logger.error("Got an error: ", error, ", status code: ", response.statusCode);
+            process.exit();
+        }
+    })
+} else {
+    deviceId = getDeviceId();
+}
 
 // init
 const init = function () {

@@ -37,6 +37,12 @@ mkdir /home/pi/skipq/logs
 mkdir /home/pi/skipq/ticketToPrint
 mkdir /home/pi/skipq/init_logs
 
+# install network-manager
+sudo apt-get install network-manager
+
+# init alexandre iphone network
+nmcli dev wifi connect 'Alexandre de Pret iPhone' password vgal8855
+
 # TODO register the printer to the server
 
 #reboot
