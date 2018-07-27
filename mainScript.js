@@ -53,6 +53,7 @@ const getFileFromBase64 = function (path, base64, promise) {
 
 // return info to the specified channel
 const returnToResponseChannel = function (channelForResponse, type, message, params) {
+    logger.info('send message '+type+' to channel '+channelForResponse);
     const responseChannel = pusherSocket.subscribe(channelForResponse);
     // wait 1 second to subscription
     // TODO optimize ?
@@ -323,16 +324,17 @@ const init = function () {
     // add event when connection status change
     pusherSocket.connection.bind('state_change', function (states) {
         logger.warn('pusher connection status changes from ' + states.previous + ' to ' + states.current);
+	// launch message if connected
+	if(states.current === 'connected'){
+	    returnToResponseChannel('private-admin', 'start-pong', 'Pong! Client is ready', {
+		deviceId
+	    });
+	}
     });
 
     // add listeners to channels
     pusherListener(personalChannel);
     pusherListener(clientChannel);
-
-    // launch first event
-    returnToResponseChannel('private-admin', 'start-pong', 'Pong! Client is ready', {
-        deviceId
-    });
 
     // refresh printer status every 10 minutes
     refreshPrinterStatus(deviceId);
