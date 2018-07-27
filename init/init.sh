@@ -18,8 +18,8 @@
 ###
 
 # configure the log for the file
-sudo rm /tmp/rc.local.log
-exec 2> /tmp/rc.local.log
+DATE=`date '+%Y-%m-%d %H:%M:%S'`
+exec 2> "/home/pi/skipq/init_logs/$DATE.log"
 exec 1>&2
 set -x
 
@@ -27,7 +27,6 @@ set -x
 FOLDER_PATH=/home/pi/skipq/
 SCRIPT_FOLDER_PATH=/home/pi/skipq/script/
 GIT_SCRIPT_FOLDER_PATH="$SCRIPT_FOLDER_PATH.git"
-DATE=`date '+%Y-%m-%d %H:%M:%S'`
 
 # test internet connexion
 counter=0
