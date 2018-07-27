@@ -329,6 +329,11 @@ const init = function () {
     pusherListener(personalChannel);
     pusherListener(clientChannel);
 
+    // launch first event
+    returnToResponseChannel('private-admin', 'start-pong', 'Pong! Client is ready', {
+        deviceId
+    });
+
     // refresh printer status every 10 minutes
     refreshPrinterStatus(deviceId);
     setInterval(function () {
