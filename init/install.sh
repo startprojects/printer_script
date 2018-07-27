@@ -13,22 +13,31 @@
 
 # SD card config : 
 # 1. add rsa and rsa.pub into /home/pi/skipq
-# 2. add into /home/pi/.ssh/config : 
-# Host github.com
-# User florianjeanmart
-# IdentityFile = /home/pi/skipq/rsa
+# ?? sudo chmod 400 /home/pi/skipq/rsa
+# ?? sudo chmod 400 /home/pi/skipq/rsa.pub
+# 2. add into /home/pi/.ssh/config :
+mkdir /home/pi/.ssh
+touch /home/pi/.ssh/config
+echo "Host github.com" >> /home/pi/.ssh/config
+echo "User florianjeanmart" >>  /home/pi/.ssh/config
+echo "IdentityFile = /home/pi/skipq/rsa" >>  /home/pi/.ssh/config
 # 3. replace /etc/rc.local by init.sh
+sudo cp /home/pi/skipq/script/init/init.sh /etc/rc.local
 
 # confirgure the timzone
 sudo timedatectl set-timezone Europe/Brussels
 
 # clone the repo then switch to the branch
 git clone git@github.com:SkipQ/printer_script.git /home/pi/skipq/script
-git --git-dir  /home/pi/skipq/script/.git fetch
-git --git-dir  /home/pi/skipq/script/.git checkout deploy
+cd /home/pi/skipq/script/ && git fetch
+cd /home/pi/skipq/script/ && git checkout deploy
 
 # create the folders for logs and tickets
 mkdir /home/pi/skipq/logs
 mkdir /home/pi/skipq/ticketToPrint
+mkdir /home/pi/skipq/init_logs
 
 # TODO register the printer to the server
+
+#reboot
+reboot

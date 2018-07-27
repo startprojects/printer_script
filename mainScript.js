@@ -261,7 +261,7 @@ const pusherListener = function (channel) {
 
 // return the device id
 const getDeviceId = function () {
-    const bodyJson = fs.readFileSync(path.resolve(__dirname, 'device.json'));
+    const bodyJson = fs.readFileSync(SKIPQ_FOLDER + 'device.json');
     const body = JSON.parse(bodyJson);
     return body.id;
 };
