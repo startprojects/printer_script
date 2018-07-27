@@ -53,7 +53,7 @@ const getFileFromBase64 = function (path, base64, promise) {
 
 // return info to the specified channel
 const returnToResponseChannel = function (channelForResponse, type, message, params) {
-    logger.info('send message '+type+' to channel '+channelForResponse);
+    logger.info('send message ' + type + ' to channel ' + channelForResponse);
     const responseChannel = pusherSocket.subscribe(channelForResponse);
     // wait 1 second to subscription
     // TODO optimize ?
@@ -106,6 +106,7 @@ const print = function (fileName, callback) {
 
 // PUSHER : pong
 const sendPong = function (type, channelForResponse) {
+    logger.info('send pong to channel ' + channelForResponse);
     returnToResponseChannel(channelForResponse, type, 'Pong! Device ' + deviceId + ' is online!', {
         deviceId
     });
@@ -190,7 +191,7 @@ const sendTicket = function (channelForResponse, ticketName) {
 const removeFileOldThanOneDay = function (folderPath) {
     fs.readdir(folderPath, function (err, files) {
         files.forEach(function (file) {
-            const filePath = folderPath+'/'+file;
+            const filePath = folderPath + '/' + file;
             fs.stat(filePath, function (err, stat) {
                 let endTime, now;
                 if (err) {
@@ -292,7 +293,7 @@ const refreshPrinterStatus = function (deviceId) {
             shell.exec(SCRIPT_FOLDER + 'bash_service/test-printer.sh',
                 (error, stdout, stderr) => {
                     const status = stdout.replace('\n', '');
-                    logger.info('Printer status : ' + status+', koAvailable:'+koAvailable);
+                    logger.info('Printer status : ' + status + ', koAvailable:' + koAvailable);
                     sendStatus(deviceId, status, koAvailable);
                 });
         });
@@ -324,12 +325,12 @@ const init = function () {
     // add event when connection status change
     pusherSocket.connection.bind('state_change', function (states) {
         logger.warn('pusher connection status changes from ' + states.previous + ' to ' + states.current);
-	// launch message if connected
-	if(states.current === 'connected'){
-	    returnToResponseChannel('private-admin', 'start-pong', 'Pong! Client is ready', {
-		deviceId
-	    });
-	}
+        // launch message if connected
+        if (states.current === 'connected') {
+            returnToResponseChannel('private-admin', 'start-pong', 'Pong! Client is ready', {
+                deviceId
+            });
+        }
     });
 
     // add listeners to channels
