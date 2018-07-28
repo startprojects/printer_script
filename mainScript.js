@@ -323,6 +323,7 @@ if (!fs.existsSync(DEVICE_INFO_PATH)) {
 } else {
     deviceId = getDeviceId();
 }
+logger.info('Registrer as printer ' + deviceId);
 
 // init
 const init = function () {
