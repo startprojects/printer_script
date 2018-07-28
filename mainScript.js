@@ -312,7 +312,7 @@ if (!fs.existsSync(DEVICE_INFO_PATH)) {
     request(SERVER_DOMAIN + '/api/registerNewPrinter', function (error, response, body) {
         if (!error && response.statusCode === 200) {
             fs.writeFileSync(DEVICE_INFO_PATH, body);
-            deviceId = body.id;
+            deviceId = JSON.parse(body).id;
             fs.writeFileSync('/home/pi/Desktop/PI-' + deviceId + '.txt', JSON.stringify(body));
 
         } else {
