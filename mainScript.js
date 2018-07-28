@@ -8,6 +8,7 @@ const SERVER_DOMAIN = 'https://business.skip-q.com';
 const TICKETS_FOLDER_NAME = 'ticketToPrint';
 const LOGS_FOLDER_NAME = 'logs';
 
+// dependencies
 const fs = require('fs');
 const rimraf = require('rimraf');
 const path = require('path');
@@ -19,6 +20,13 @@ const Pusher = require('pusher-js');
 const dateFormat = require('dateformat');
 const dns = require('dns');
 const _ = require('underscore');
+
+// variable
+let personalChannel;
+let clientChannel;
+let pusherSocket;
+let deviceId;
+
 
 // test internet connection
 const testInternetConnection = function (callback) {
@@ -300,31 +308,6 @@ const refreshPrinterStatus = function (deviceId) {
         });
 };
 
-// variable
-let personalChannel;
-let clientChannel;
-let pusherSocket;
-let deviceId;
-
-// load the device id or register the printer
-if (!fs.existsSync(DEVICE_INFO_PATH)) {
-    logger.info('device.json file not found : registre the device');
-    request(SERVER_DOMAIN + '/api/registerNewPrinter', function (error, response, body) {
-        if (!error && response.statusCode === 200) {
-            fs.writeFileSync(DEVICE_INFO_PATH, body);
-            deviceId = JSON.parse(body).id;
-            fs.writeFileSync('/home/pi/Desktop/PI-' + deviceId + '.txt', JSON.stringify(body));
-
-        } else {
-            logger.error("Got an error: ", error, ", status code: ", response.statusCode);
-            process.exit();
-        }
-    })
-} else {
-    deviceId = getDeviceId();
-}
-logger.info('Registrer as printer ' + deviceId);
-
 // init
 const init = function () {
 
@@ -364,45 +347,48 @@ const init = function () {
 };
 
 // starter
-testInternetConnection((isInternetAvailable) => {
-    if (isInternetAvailable) {
-        init();
-    }
-    else {
-        // no internet connexion ? wait...
-        const starterInterval = setInterval(function () {
-            testInternetConnection((isInternetAvailable) => {
-                if (isInternetAvailable) {
-                    init();
-                    clearInterval(starterInterval);
-                }
-                else {
-                    logger.info("not internet connection. Retry in 10 seconds.....");
-                }
-            });
-        }, 10 * 1000);
-    }
-});
+const start = function () {
+    testInternetConnection((isInternetAvailable) => {
+        if (isInternetAvailable) {
+            init();
+        }
+        else {
+            // no internet connexion ? wait...
+            const starterInterval = setInterval(function () {
+                testInternetConnection((isInternetAvailable) => {
+                    if (isInternetAvailable) {
+                        init();
+                        clearInterval(starterInterval);
+                    }
+                    else {
+                        logger.info("not internet connection. Retry in 10 seconds.....");
+                    }
+                });
+            }, 10 * 1000);
+        }
+    });
+};
 
-// check connection
-/*
-const checkConnection = setInterval(function () {
-	if(pusherSocket){
-	    const state = pusherSocket.connection.state;
-		logger.info('pusher connection state : '+state);
-		if(state === 'failed' || state === 'unavailable' || state === 'disconnected'){
-			testInternetConnection((isInternetAvailable) => {
-				if(isInternetAvailable){
-					logger.error('error with pusher connection. State is : '+state);
-				}
-				else{
-					logger.error('No internet connection.');
-				}
-			});
-		}
-	}
-}, 5 * 1000);
-*/
+// load the device id or register the printer
+if (!fs.existsSync(DEVICE_INFO_PATH)) {
+    logger.info('device.json file not found : registre the device');
+    request(SERVER_DOMAIN + '/api/registerNewPrinter', function (error, response, body) {
+        if (!error && response.statusCode === 200) {
+            fs.writeFileSync(DEVICE_INFO_PATH, body);
 
+            deviceId = getDeviceId();
+            // just for information
+            fs.writeFileSync('/home/pi/Desktop/PI-' + deviceId + '.txt', JSON.stringify(body));
+            logger.info('Registered as printer ' + deviceId);
+            start();
 
-
+        } else {
+            logger.error("Got an error: ", error, ", status code: ", response.statusCode);
+            process.exit();
+        }
+    })
+} else {
+    deviceId = getDeviceId();
+    logger.info('Printer ' + deviceId);
+    start();
+}
