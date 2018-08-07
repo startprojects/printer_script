@@ -278,7 +278,7 @@ const getDeviceId = function () {
 // send the status in parameter to the sever
 const sendStatus = function (deviceId, status, koAvailable) {
     request({
-        url: 'https://business.skip-q.com/api/printer/' + deviceId + '/status',
+        url: SERVER_DOMAIN + '/api/printer/' + deviceId + '/status',
         method: 'PUT',
         json: {
             status: status,
