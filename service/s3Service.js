@@ -26,7 +26,7 @@ exports.uploadFile = function (sourcePath, target) {
     const uploader = getClient().uploadFile({
         localFile: sourcePath,
         s3Params: {
-            Bucket: "skipqdata-printerlogs",
+            Bucket: "skipqprivate",
             Key: target,
         },
     });

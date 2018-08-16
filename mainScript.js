@@ -126,7 +126,7 @@ const sendPong = function (type, channelForResponse) {
 const sendLog = function (channelForResponse, logName) {
     logger.info('send log ' + logName + ' to ' + channelForResponse);
     const filePath = SKIPQ_FOLDER + LOGS_FOLDER_NAME + '/' + logName;
-    const target = deviceId + '/' + logName;
+    const target = 'printerLogs/' + deviceId + '/' + logName;
     s3Service.uploadFile(filePath, target);
     returnToResponseChannel(channelForResponse, 'log', {target});
 };
