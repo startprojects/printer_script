@@ -20,6 +20,7 @@ const Pusher = require('pusher-js');
 const dateFormat = require('dateformat');
 const dns = require('dns');
 const _ = require('underscore');
+const s3Service = require('./service/s3Service');
 
 // variable
 let personalChannel;
@@ -124,9 +125,10 @@ const sendPong = function (type, channelForResponse) {
 // PUSHER : log
 const sendLog = function (channelForResponse, logName) {
     logger.info('send log ' + logName + ' to ' + channelForResponse);
-    fs.readFile(SKIPQ_FOLDER + LOGS_FOLDER_NAME + '/' + logName, {encoding: 'utf-8'}, function (err, data) {
-        returnToResponseChannel(channelForResponse, 'log', data);
-    });
+    const filePath = SKIPQ_FOLDER + LOGS_FOLDER_NAME + '/' + logName;
+    const target = deviceId + '/' + logName;
+    s3Service.uploadFile(filePath, target);
+    returnToResponseChannel(channelForResponse, 'log', {target});
 };
 
 // PUSHER : list of logs
