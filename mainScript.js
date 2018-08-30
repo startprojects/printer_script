@@ -166,13 +166,17 @@ const printOrder = function (name, printTaskId, base64Ticket) {
                         }
                         else {
                             attempt++;
-                            if (attempt > 12) {
+                            if (attempt > 4) {
+                                // after 2 minutes, change the status but continue the loop
                                 sendPrintResult(printTaskId, 'FAILED : PRINTER OFF');
+                            }
+                            // after 6 hours, stop loop
+                            if (attempt >= 6 * 60 * 2) {
                                 clearInterval(testInterval);
                             }
                         }
                     });
-                }, 10000);
+                }, 30 * 1000);
             }
         });
     });
