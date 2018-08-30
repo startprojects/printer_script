@@ -23,7 +23,6 @@ const _ = require('underscore');
 
 // services
 const s3Service = require('./service/s3Service');
-const printerService = require('./service/printerService');
 
 // variable
 let personalChannel;
@@ -153,25 +152,21 @@ const printOrder = function (name, printTaskId, base64Ticket) {
     sendPrintResult(printTaskId, 'ORDER RECEIVED');
     const time = dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss');
     const fileName = SKIPQ_FOLDER + TICKETS_FOLDER_NAME + '/' + name + ' - ' + time + '.pdf';
-    printerService.saveTask(printTaskId, fileName, "WAITING_PRINT");
     logger.info('Try to print order  ' + fileName);
     getFileFromBase64(fileName, base64Ticket, () => {
         print(fileName, (printReference) => {
             if (printTaskId) {
-                printerService.updatePrinterTaskId(printTaskId, printReference);
                 logger.info('Test print result for  ' + printReference + ' / ' + printTaskId);
                 let attempt = 0;
                 const testInterval = setInterval(function () {
                     getPrintResult(printReference, (result) => {
                         if (result === 'DONE') {
-                            printerService.updateStatus(printTaskId, 'DONE');
                             sendPrintResult(printTaskId, 'DONE');
                             clearInterval(testInterval);
                         }
                         else {
                             attempt++;
                             if (attempt > 12) {
-                                printerService.updateStatus(printTaskId, 'FAILED : PRINTER OFF');
                                 sendPrintResult(printTaskId, 'FAILED : PRINTER OFF');
                                 clearInterval(testInterval);
                             }
