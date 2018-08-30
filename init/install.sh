@@ -11,6 +11,19 @@
 # /home/pi/skipq/script : the git repo that should be executed. Should contains at least the mainScript.js file
 ####
 
+# configure :
+# install printer tool
+sudo apt-get update
+sudo apt-get  install cups-client
+# follow this tutorial  : https://www.hmazter.com/2013/05/raspberry-pi-printer-server-for-labelwriter/
+# define printer as main printer
+lpadmin -d DYMO_LabelWriter_450
+# install node
+sudo apt-get install nodejs
+
+
+
+
 # SD card config : 
 # 1. add rsa and rsa.pub into /home/pi/skipq
 # ?? sudo chmod 400 /home/pi/skipq/rsa
@@ -21,8 +34,7 @@ touch /home/pi/.ssh/config
 echo "Host github.com" >> /home/pi/.ssh/config
 echo "User florianjeanmart" >>  /home/pi/.ssh/config
 echo "IdentityFile = /home/pi/skipq/rsa" >>  /home/pi/.ssh/config
-# 3. replace /etc/rc.local by init.sh
-sudo cp /home/pi/skipq/script/init/init.sh /etc/rc.local
+echo "StrictHostKeyChecking no" >>  /home/pi/.ssh/config
 
 # confirgure the timzone
 sudo timedatectl set-timezone Europe/Brussels
@@ -31,6 +43,9 @@ sudo timedatectl set-timezone Europe/Brussels
 git clone git@github.com:SkipQ/printer_script.git /home/pi/skipq/script
 cd /home/pi/skipq/script/ && git fetch
 cd /home/pi/skipq/script/ && git checkout deploy
+
+# 3. replace /etc/rc.local by init.sh
+sudo cp /home/pi/skipq/script/init/init.sh /etc/rc.local
 
 # create the folders for logs and tickets
 mkdir /home/pi/skipq/logs
@@ -41,7 +56,7 @@ mkdir /home/pi/skipq/init_logs
 sudo apt-get install network-manager
 
 # init alexandre iphone network
-nmcli dev wifi connect 'Alexandre de Pret iPhone' password vgal8855
+# nmcli dev wifi connect 'Alexandre de Pret iPhone' password vgal8855
 
 # TODO register the printer to the server
 

@@ -147,6 +147,7 @@ const sendLogs = function (channelForResponse) {
 
 // PUSHER : print
 const printOrder = function (name, printTaskId, base64Ticket) {
+    sendPrintResult(printTaskId, 'ORDER RECEIVED');
     const time = dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss');
     const fileName = SKIPQ_FOLDER + TICKETS_FOLDER_NAME + '/' + name + ' - ' + time + '.pdf';
     logger.info('Try to print order  ' + fileName);
@@ -158,13 +159,13 @@ const printOrder = function (name, printTaskId, base64Ticket) {
                 const testInterval = setInterval(function () {
                     getPrintResult(printReference, (result) => {
                         if (result === 'DONE') {
-                            sendPrintResult(printTaskId, result);
+                            sendPrintResult(printTaskId, 'DONE');
                             clearInterval(testInterval);
                         }
                         else {
                             attempt++;
                             if (attempt > 12) {
-                                sendPrintResult(printTaskId, 'FAILED AFTER 2 MINUTES');
+                                sendPrintResult(printTaskId, 'FAILED : PRINTER OFF');
                                 clearInterval(testInterval);
                             }
                         }
@@ -334,6 +335,7 @@ const init = function () {
             returnToResponseChannel('private-admin', 'start-pong', 'Pong! Client is ready', {
                 deviceId
             });
+            refreshPrinterStatus(deviceId);
         }
     });
 
