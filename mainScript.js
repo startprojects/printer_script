@@ -91,6 +91,7 @@ const getPrintResult = function (printReference, callback) {
 
 // send print result
 const sendPrintResult = function (printTaskId, result) {
+    logger.info("sendPrintResult " + printTaskId + " / " + result);
     request({
         url: SERVER_DOMAIN + '/api/printTask/' + printTaskId + '/status',
         method: 'PUT',
