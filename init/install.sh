@@ -30,6 +30,8 @@ sudo mysql -u root
 GRANT ALL PRIVILEGES on *.* to 'root'@'localhost' IDENTIFIED BY 'root';
 FLUSH PRIVILEGES;
 # create DB /  table
+create database printer;
+use printer;
 create table print_task(
    id  bigint(20) NOT NULL AUTO_INCREMENT,
    printTaskId  bigint(20) NOT NULL,
