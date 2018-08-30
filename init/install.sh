@@ -21,6 +21,23 @@ lpadmin -d DYMO_LabelWriter_450
 # install node
 sudo apt-get install nodejs
 
+# mysql
+sudo apt-get install mysql-server
+# change root password
+# sudo mysqladmin -u root password
+# change password
+sudo mysql -u root
+GRANT ALL PRIVILEGES on *.* to 'root'@'localhost' IDENTIFIED BY 'root';
+FLUSH PRIVILEGES;
+# create DB /  table
+create table print_task(
+   id  bigint(20) NOT NULL AUTO_INCREMENT,
+   printTaskId  bigint(20) NOT NULL,
+   fileName VARCHAR(255) NOT NULL,
+   status VARCHAR(255) NOT NULL,
+   printerTaskId VARCHAR(255),
+   PRIMARY KEY ( id )
+);
 
 
 
