@@ -38,6 +38,7 @@ create table print_task(
    fileName VARCHAR(255) NOT NULL,
    status VARCHAR(255) NOT NULL,
    printerTaskId VARCHAR(255),
+   createdAt datetime NOT NULL,
    PRIMARY KEY ( id )
 );
 
