@@ -5,7 +5,6 @@
 # /etc/rc.local : contain the script to pull the branch + execute the script
 # /home/pi/skipq : contain files that installed at the initialisation of the SD card.
 #           these files should not be removed!
-#           rsa / rsa.bus : the ssh key used for the log to github
 #           /logs : contains logs
 #           /ticketToPrint : contains all tickets received
 # /home/pi/skipq/script : the git repo that should be executed. Should contains at least the mainScript.js file
@@ -42,24 +41,11 @@ create table print_task(
 );
 
 
-
-# SD card config : 
-# 1. add rsa and rsa.pub into /home/pi/skipq
-# ?? sudo chmod 400 /home/pi/skipq/rsa
-# ?? sudo chmod 400 /home/pi/skipq/rsa.pub
-# 2. add into /home/pi/.ssh/config :
-mkdir /home/pi/.ssh
-touch /home/pi/.ssh/config
-echo "Host github.com" >> /home/pi/.ssh/config
-echo "User florianjeanmart" >>  /home/pi/.ssh/config
-echo "IdentityFile = /home/pi/skipq/rsa" >>  /home/pi/.ssh/config
-echo "StrictHostKeyChecking no" >>  /home/pi/.ssh/config
-
 # confirgure the timzone
 sudo timedatectl set-timezone Europe/Brussels
 
 # clone the repo then switch to the branch
-git clone git@github.com:SkipQ/printer_script.git /home/pi/skipq/script
+git clone https://github.com/SkipQ/printer_script.git /home/pi/skipq/script
 cd /home/pi/skipq/script/ && git fetch
 cd /home/pi/skipq/script/ && git checkout deploy
 
