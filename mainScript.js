@@ -7,6 +7,7 @@ const SERVER_DOMAIN = 'https://order.skip-q.com';
 const TICKETS_FOLDER_NAME = 'ticketToPrint';
 const LOGS_FOLDER_NAME = 'logs';
 
+
 // dependencies
 const fs = require('fs');
 const rimraf = require('rimraf');
