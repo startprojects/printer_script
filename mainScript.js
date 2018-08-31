@@ -331,7 +331,7 @@ const init = function () {
     // Some stuff to print ?
     printerService.getFailedTaskForToday((results) => {
         _.forEach(results, (row) => {
-            console.log(row.printTaskId);
+            console.log(row.printerTaskId);
         })
     });
 
