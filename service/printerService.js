@@ -49,9 +49,9 @@ exports.getFailedTaskForToday = function (callback) {
     start.setHours(0);
     const dateFormated = dateFormat(start, 'yyyy-mm-dd HH:MM:ss');
 
-    con.query("SELECT * FROM print_task WHERE status != 'DONE' AND createdAt > '" + dateFormated + "'", function (err, result) {
-        if (err) throw err;
-        console.log("Result: ", result);
-        callback();
-    });
+    con.query("SELECT * FROM print_task WHERE status != 'DONE' AND createdAt > '" + dateFormated + "'",
+        function (err, result) {
+            if (err) throw err;
+            callback(result);
+        });
 };

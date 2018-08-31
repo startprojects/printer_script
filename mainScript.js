@@ -4,7 +4,7 @@ const DEVICE_INFO_PATH = SKIPQ_FOLDER + 'device.json';
 const SCRIPT_FOLDER = SKIPQ_FOLDER + 'script/';
 const PUSHER_PUBLIC_KEY = '06ce1e8c960dc055e0d4';
 const PUSHER_CLUSTER = 'eu';
-const SERVER_DOMAIN = 'https://order.skip-q.com';
+const SERVER_DOMAIN = 'https://business.skip-q.com';
 const TICKETS_FOLDER_NAME = 'ticketToPrint';
 const LOGS_FOLDER_NAME = 'logs';
 
@@ -329,8 +329,10 @@ const init = function () {
     logger.info('Init for ' + deviceId);
 
     // Some stuff to print ?
-    printerService.getFailedTaskForToday(() => {
-        
+    printerService.getFailedTaskForToday((results) => {
+        _.forEach(results, (row) => {
+            console.log(row.printTaskId);
+        })
     });
 
     // PUSHER : authentication
