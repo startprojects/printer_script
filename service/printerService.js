@@ -47,11 +47,11 @@ exports.getFailedTaskForToday = function (callback) {
     start.setMinutes(0);
     start.setSeconds(0);
     start.setHours(0);
-    const dateFormated = dateFormat(start, 'dd-mm-yyyy HH:MM:ss');
+    const dateFormated = dateFormat(start, 'yyyy-mm-dd HH:MM:ss');
 
-    con.query("SELECT * FROM print_task WHERE status = 'FAILED : PRINTER OFF' AND createdAt > '" + dateFormated + "'", function (err, result) {
+    con.query("SELECT * FROM print_task WHERE status != 'DONE' AND createdAt > '" + dateFormated + "'", function (err, result) {
         if (err) throw err;
-        console.log("Result: " + result);
+        console.log("Result: ", result);
         callback();
     });
 };

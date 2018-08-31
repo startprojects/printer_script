@@ -329,7 +329,9 @@ const init = function () {
     logger.info('Init for ' + deviceId);
 
     // Some stuff to print ?
-    printerService.getFailedTaskForToday();
+    printerService.getFailedTaskForToday(() => {
+        
+    });
 
     // PUSHER : authentication
     pusherSocket = new Pusher(PUSHER_PUBLIC_KEY, {
