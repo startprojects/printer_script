@@ -5,7 +5,6 @@
 # /etc/rc.local : contain the script to pull the branch + execute the script
 # /home/pi/skipq : contain files that installed at the initialisation of the SD card.
 #           these files should not be removed!
-#           rsa / rsa.bus : the ssh key used for the log to github
 #           /logs : contains logs
 #           /ticketToPrint : contains all tickets received
 # /home/pi/skipq/script : the git repo that should be executed. Should contains at least the mainScript.js file
@@ -15,6 +14,7 @@
 # install printer tool
 sudo apt-get update
 sudo apt-get  install cups-client
+# !!! wrong printer version : the task are remove when there is no paper into the printer
 # follow this tutorial  : https://www.hmazter.com/2013/05/raspberry-pi-printer-server-for-labelwriter/
 # define printer as main printer
 lpadmin -d DYMO_LabelWriter_450
@@ -38,7 +38,6 @@ create table print_task(
    fileName VARCHAR(255) NOT NULL,
    status VARCHAR(255) NOT NULL,
    printerTaskId VARCHAR(255),
-   createdAt datetime NOT NULL,
    PRIMARY KEY ( id )
 );
 
@@ -60,7 +59,7 @@ echo "StrictHostKeyChecking no" >>  /home/pi/.ssh/config
 sudo timedatectl set-timezone Europe/Brussels
 
 # clone the repo then switch to the branch
-git clone git@github.com:SkipQ/printer_script.git /home/pi/skipq/script
+git clone https://github.com/SkipQ/printer_script.git /home/pi/skipq/script
 cd /home/pi/skipq/script/ && git fetch
 cd /home/pi/skipq/script/ && git checkout deploy
 

@@ -1,21 +1,17 @@
 // CONSTANTS
 const SKIPQ_FOLDER = '/home/pi/skipq/';
 const DEVICE_INFO_PATH = SKIPQ_FOLDER + 'device.json';
+const PUSHER_INFO_PATH = SKIPQ_FOLDER + 'pusher_info.json';
 const SCRIPT_FOLDER = SKIPQ_FOLDER + 'script/';
-const PUSHER_PUBLIC_KEY = '06ce1e8c960dc055e0d4';
-const PUSHER_CLUSTER = 'eu';
-const SERVER_DOMAIN = 'https://business.skip-q.com';
+const SERVER_DOMAIN = 'https://order.skip-q.com';
 const TICKETS_FOLDER_NAME = 'ticketToPrint';
 const LOGS_FOLDER_NAME = 'logs';
 
 // dependencies
 const fs = require('fs');
 const rimraf = require('rimraf');
-const path = require('path');
-// const winston = require('winston');
 const request = require('request');
 const shell = require('shelljs');
-// const Pusher = require('pusher-client');
 const Pusher = require('pusher-js');
 const dateFormat = require('dateformat');
 const dns = require('dns');
@@ -290,6 +286,13 @@ const getDeviceId = function () {
     return body.id;
 };
 
+// return the pusher public key
+const getPusherInfo = function () {
+    const bodyJson = fs.readFileSync(PUSHER_INFO_PATH);
+    const body = JSON.parse(bodyJson);
+    return body;
+};
+
 // send the status in parameter to the sever
 const sendStatus = function (deviceId, status, koAvailable) {
     request({
@@ -336,8 +339,10 @@ const init = function () {
     });
 
     // PUSHER : authentication
-    pusherSocket = new Pusher(PUSHER_PUBLIC_KEY, {
-        cluster: PUSHER_CLUSTER,
+    // load public key
+
+    pusherSocket = new Pusher(getPusherInfo().publicKey, {
+        cluster: getPusherInfo().cluster,
         encrypted: true,
         authEndpoint: SERVER_DOMAIN + '/pusher/auth'
     });
