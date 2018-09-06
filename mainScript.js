@@ -3,6 +3,7 @@ const SKIPQ_FOLDER = '/home/pi/skipq/';
 const DEVICE_INFO_PATH = SKIPQ_FOLDER + 'device.json';
 const PUSHER_INFO_PATH = SKIPQ_FOLDER + 'pusher_info.json';
 const SCRIPT_FOLDER = SKIPQ_FOLDER + 'script/';
+const SCRIPT_INFO_PATH = SCRIPT_FOLDER + 'info.json';
 const SERVER_DOMAIN = 'https://order.skip-q.com';
 const TICKETS_FOLDER_NAME = 'ticketToPrint';
 const LOGS_FOLDER_NAME = 'logs';
@@ -27,6 +28,12 @@ let clientChannel;
 let pusherSocket;
 let deviceId;
 
+// get version
+const getVersion = function () {
+    const bodyJson = fs.readFileSync(SCRIPT_INFO_PATH);
+    const body = JSON.parse(bodyJson);
+    return body.version;
+};
 
 // test internet connection
 const testInternetConnection = function (callback) {
@@ -117,7 +124,7 @@ const print = function (fileName, callback) {
 // PUSHER : pong
 const sendPong = function (type, channelForResponse) {
     logger.info('send pong to channel ' + channelForResponse);
-    returnToResponseChannel(channelForResponse, type, 'Pong! Device ' + deviceId + ' is online!', {
+    returnToResponseChannel(channelForResponse, type, 'Device ' + deviceId + ' is online with ' + getVersion(), {
         deviceId
     });
 };
