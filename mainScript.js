@@ -1,16 +1,6 @@
-// CONSTANTS
-const SKIPQ_FOLDER = '/home/pi/skipq/';
-const DEVICE_INFO_PATH = SKIPQ_FOLDER + 'device.json';
-const PUSHER_INFO_PATH = SKIPQ_FOLDER + 'pusher_info.json';
-const SCRIPT_FOLDER = SKIPQ_FOLDER + 'script/';
-const SCRIPT_INFO_PATH = SCRIPT_FOLDER + 'info.json';
-const SERVER_DOMAIN = 'https://order.skip-q.com';
-const TICKETS_FOLDER_NAME = 'ticketToPrint';
-const LOGS_FOLDER_NAME = 'logs';
-const INIT_LOGS_FOLDER_NAME = 'init_logs';
-
-
 // dependencies
+const constant = require('./constant');
+const utils = require('./service/utils');
 const fs = require('fs');
 const rimraf = require('rimraf');
 const request = require('request');
@@ -19,9 +9,7 @@ const Pusher = require('pusher-js');
 const dateFormat = require('dateformat');
 const dns = require('dns');
 const _ = require('underscore');
-
-// services
-const s3Service = require('./service/s3Service');
+const copyFileSync = require('fs-copy-file-sync');
 
 // variable
 let personalChannel;
@@ -29,35 +17,11 @@ let clientChannel;
 let pusherSocket;
 let deviceId;
 
-// get version
-const getVersion = function () {
-    const bodyJson = fs.readFileSync(SCRIPT_INFO_PATH);
-    const body = JSON.parse(bodyJson);
-    return body.version;
-};
-
 // test internet connection
 const testInternetConnection = function (callback) {
     dns.lookup('google.com', function (err) {
         callback(!err);
     });
-};
-
-// init logger
-const logger = {
-    info: function (text) {
-        this.print('INFO', text);
-    },
-    error: function (text) {
-        this.print('ERROR', text);
-    },
-    warn: function (text) {
-        this.print('WARN', text);
-    },
-    print: function (level, text) {
-        const currentTime = dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss');
-        console.log(`${currentTime} ${level}: ${text}`);
-    }
 };
 
 // convert string to file
@@ -70,7 +34,7 @@ const getFileFromBase64 = function (path, base64, promise) {
 
 // return info to the specified channel
 const returnToResponseChannel = function (channelForResponse, type, message, params) {
-    logger.info('send message ' + type + ' to channel ' + channelForResponse);
+    utils.logger.info('send message ' + type + ' to channel ' + channelForResponse);
     const responseChannel = pusherSocket.subscribe(channelForResponse);
     // wait 1 second to subscription
     // TODO optimize ?
@@ -86,26 +50,26 @@ const returnToResponseChannel = function (channelForResponse, type, message, par
 
 // get the result of the prinr
 const getPrintResult = function (printReference, callback) {
-    shell.exec(SCRIPT_FOLDER + 'bash_service/test-print.sh "' + printReference + '"',
+    shell.exec(constant.SCRIPT_FOLDER + 'bash_service/test-print.sh "' + printReference + '"',
         (error, stdout, stderr) => {
             const status = stdout.replace('\n', '');
-            logger.info('Status for ' + printReference + ' : ' + status);
+            utils.logger.info('Status for ' + printReference + ' : ' + status);
             callback(status);
         })
 };
 
 // send print result
 const sendPrintResult = function (printTaskId, result) {
-    logger.info("sendPrintResult " + printTaskId + " / " + result);
+    utils.logger.info("sendPrintResult " + printTaskId + " / " + result);
     request({
-        url: SERVER_DOMAIN + '/api/printTask/' + printTaskId + '/status',
+        url: constant.SERVER_DOMAIN + '/api/printTask/' + printTaskId + '/status',
         method: 'PUT',
         json: {
             status: result,
         }
     }, function (err, e, b) {
         if (err) {
-            logger.error('Send status to   : ' + JSON.stringify(err));
+            utils.logger.error('Send status to   : ' + JSON.stringify(err));
         }
     })
 };
@@ -117,27 +81,27 @@ const print = function (fileName, callback) {
             const orderReferenceReg = /request id is ([^ ]*)/;
             const match = orderReferenceReg.exec(stdout);
             const printReference = match[1];
-            logger.info('Print reference : ' + printReference);
+            utils.logger.info('Print reference : ' + printReference);
             callback(printReference);
         });
 };
 
 // PUSHER : pong
 const sendPong = function (type, channelForResponse) {
-    logger.info('send pong to channel ' + channelForResponse);
-    returnToResponseChannel(channelForResponse, type, 'Device ' + deviceId + ' is online with ' + getVersion(), {
+    utils.logger.info('send pong to channel ' + channelForResponse);
+    returnToResponseChannel(channelForResponse, type, 'Device ' + deviceId + ' is online with ' + utils.getVersion(), {
         deviceId
     });
 };
 
 // PUSHER : log
 const sendLog = function (channelForResponse, logName, logType) {
-    logger.info('send log ' + logName + ' to ' + channelForResponse);
-    const filePath = SKIPQ_FOLDER + (logType === 'initLog' ? INIT_LOGS_FOLDER_NAME : LOGS_FOLDER_NAME) + '/' + logName;
+    utils.logger.info('send log ' + logName + ' to ' + channelForResponse);
+    const filePath = (logType === 'initLog' ? constant.INIT_LOGS_FOLDER_PATH : constant.LOGS_FOLDER_PATH) + '/' + logName;
     const bitmap = fs.readFileSync(filePath);
     const fileInBase64 = new Buffer(bitmap).toString('base64');
     request({
-        url: SERVER_DOMAIN + '/api/printer/' + getDeviceId() + '/log',
+        url: constant.SERVER_DOMAIN + '/api/printer/' + utils.getDeviceId() + '/log',
         method: 'PUT',
         json: {
             content: fileInBase64,
@@ -145,7 +109,7 @@ const sendLog = function (channelForResponse, logName, logType) {
         }
     }, function (err, e, b) {
         if (err) {
-            logger.error('Send status to   : ' + JSON.stringify(err));
+            utils.logger.error('Send status to   : ' + JSON.stringify(err));
         }
         const target = 'printerLogs/' + deviceId + '/' + logName;
         returnToResponseChannel(channelForResponse, 'log', {target});
@@ -154,12 +118,12 @@ const sendLog = function (channelForResponse, logName, logType) {
 
 // PUSHER : list of logs
 const sendLogs = function (channelForResponse) {
-    shell.exec('ls -1 ' + SKIPQ_FOLDER + LOGS_FOLDER_NAME,
+    shell.exec('ls -1 ' + constant.LOGS_FOLDER_PATH,
         (error, stdout) => {
             const arr = _.filter(stdout.split("\n"), (name) => {
                 return name && name.length > 2;
             });
-            shell.exec('ls -1 ' + SKIPQ_FOLDER + INIT_LOGS_FOLDER_NAME,
+            shell.exec('ls -1 ' + constant.INIT_LOGS_FOLDER_PATH,
                 (error2, stdout2) => {
                     const arr2 = _.filter(stdout2.split("\n"), (name) => {
                         return name && name.length > 2;
@@ -177,12 +141,12 @@ const sendLogs = function (channelForResponse) {
 const printOrder = function (name, printTaskId, base64Ticket) {
     sendPrintResult(printTaskId, 'ORDER RECEIVED');
     const time = dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss');
-    const fileName = SKIPQ_FOLDER + TICKETS_FOLDER_NAME + '/' + name + ' - ' + time + '.pdf';
-    logger.info('Try to print order  ' + fileName);
+    const fileName = constant.TICKETS_FOLDER_PATH + '/' + name + ' - ' + time + '.pdf';
+    utils.logger.info('Try to print order  ' + fileName);
     getFileFromBase64(fileName, base64Ticket, () => {
         print(fileName, (printReference) => {
             if (printTaskId) {
-                logger.info('Test print result for  ' + printReference + ' / ' + printTaskId);
+                utils.logger.info('Test print result for  ' + printReference + ' / ' + printTaskId);
                 let attempt = 0;
                 const testInterval = setInterval(function () {
                     getPrintResult(printReference, (result) => {
@@ -210,7 +174,7 @@ const printOrder = function (name, printTaskId, base64Ticket) {
 
 // PUSH : list order tickets
 const listOrderTickets = function (channelForResponse) {
-    shell.exec('ls -1 ' + SKIPQ_FOLDER + TICKETS_FOLDER_NAME,
+    shell.exec('ls -1 ' + constant.TICKETS_FOLDER_PATH,
         (error, stdout) => {
             const arr = _.filter(stdout.split("\n"), (name) => {
                 return name && name.length > 2;
@@ -223,7 +187,7 @@ const listOrderTickets = function (channelForResponse) {
 
 // PUSHER : send ticket in base64
 const sendTicket = function (channelForResponse, ticketName) {
-    const bitmap = fs.readFileSync(SKIPQ_FOLDER + TICKETS_FOLDER_NAME + '/' + ticketName);
+    const bitmap = fs.readFileSync(constant.TICKETS_FOLDER_PATH + '/' + ticketName);
     const fileInBase64 = new Buffer(bitmap).toString('base64');
     returnToResponseChannel(channelForResponse, 'send_ticket', 'list', {
         file: fileInBase64,
@@ -256,15 +220,15 @@ const removeFileOldThanOneDay = function (folderPath) {
     });
 };
 const cleanComputer = function () {
-    removeFileOldThanOneDay(SKIPQ_FOLDER + TICKETS_FOLDER_NAME);
-    removeFileOldThanOneDay(SKIPQ_FOLDER + LOGS_FOLDER_NAME);
+    removeFileOldThanOneDay(constant.TICKETS_FOLDER_PATH);
+    removeFileOldThanOneDay(constant.LOGS_FOLDER_PATH);
 };
 
 
 // PUSHER : listeners
 const pusherListener = function (channel) {
     channel.bind('main', function (data) {
-        logger.info('Main event received : ' + data.type);
+        utils.logger.info('Main event received : ' + data.type);
         switch (data.type) {
             case 'ping':
                 sendPong('pong', data.channelForResponse);
@@ -303,57 +267,17 @@ const pusherListener = function (channel) {
     });
 };
 
-// return the device id
-const getDeviceId = function () {
-    const bodyJson = fs.readFileSync(DEVICE_INFO_PATH);
-    const body = JSON.parse(bodyJson);
-    return body.id;
-};
-
 // return the pusher public key
 const getPusherInfo = function () {
-    const bodyJson = fs.readFileSync(PUSHER_INFO_PATH);
+    const bodyJson = fs.readFileSync(constant.PUSHER_INFO_PATH);
     const body = JSON.parse(bodyJson);
     return body;
-};
-
-// send the status in parameter to the sever
-const sendStatus = function (deviceId, status, koAvailable) {
-    request({
-        url: SERVER_DOMAIN + '/api/printer/' + deviceId + '/status',
-        method: 'PUT',
-        json: {
-            status: status,
-            koAvailable,
-        }
-    }, function (err, e, b) {
-        if (err) {
-            // internet connection error ?
-            logger.error('Send status to   : ' + JSON.stringify(err));
-        }
-    })
-};
-
-// refresh the printer status
-const refreshPrinterStatus = function (deviceId) {
-    shell.exec('df /',
-        (error, stdout) => {
-            const myRegexp = /([^ ]+) +([^ ]+) +([^ ]+) +([^ ]+) +([^ ]+) \//g;
-            const match = myRegexp.exec(stdout);
-            const koAvailable = match[4];
-            shell.exec(SCRIPT_FOLDER + 'bash_service/test-printer.sh',
-                (error, stdout, stderr) => {
-                    const status = stdout.replace('\n', '');
-                    logger.info('Printer status : ' + status + ', koAvailable:' + koAvailable);
-                    sendStatus(deviceId, status, koAvailable);
-                });
-        });
 };
 
 // init
 const init = function () {
 
-    logger.info('Init for ' + deviceId);
+    utils.logger.info('Init for ' + deviceId);
 
     // PUSHER : authentication
     // load public key
@@ -361,7 +285,7 @@ const init = function () {
     pusherSocket = new Pusher(getPusherInfo().publicKey, {
         cluster: getPusherInfo().cluster,
         encrypted: true,
-        authEndpoint: SERVER_DOMAIN + '/pusher/auth'
+        authEndpoint: constant.SERVER_DOMAIN + '/pusher/auth'
     });
 
     // subscribe to pusher channel
@@ -370,25 +294,18 @@ const init = function () {
 
     // add event when connection status change
     pusherSocket.connection.bind('state_change', function (states) {
-        logger.warn('pusher connection status changes from ' + states.previous + ' to ' + states.current);
+        utils.logger.warn('pusher connection status changes from ' + states.previous + ' to ' + states.current);
         // launch message if connected
         if (states.current === 'connected') {
             returnToResponseChannel('private-admin', 'start-pong', 'Pong! Client is ready', {
                 deviceId
             });
-            refreshPrinterStatus(deviceId);
         }
     });
 
     // add listeners to channels
     pusherListener(personalChannel);
     pusherListener(clientChannel);
-
-    // refresh printer status every 10 minutes
-    setInterval(function () {
-        refreshPrinterStatus(deviceId);
-    }, 10 * 60 * 1000);
-    // the first refresh should send by pusher connection status
 };
 
 // starter
@@ -406,7 +323,7 @@ const start = function () {
                         clearInterval(starterInterval);
                     }
                     else {
-                        logger.info("not internet connection. Retry in 10 seconds.....");
+                        utils.logger.info("not internet connection. Retry in 10 seconds.....");
                     }
                 });
             }, 10 * 1000);
@@ -414,26 +331,32 @@ const start = function () {
     });
 };
 
-// load the device id or register the printer
-if (!fs.existsSync(DEVICE_INFO_PATH)) {
-    logger.info('device.json file not found : registre the device');
-    request(SERVER_DOMAIN + '/api/registerNewPrinter', function (error, response, body) {
+// if there is a new init file, replace and reload
+if (!fs.existsSync('/etc/rc.local') || fs.readFileSync(constant.SCRIPT_FOLDER + 'init/init.sh').toString() !== fs.readFileSync('/etc/rc.local').toString()) {
+    copyFileSync(constant.SCRIPT_FOLDER + 'init/init.sh', '/etc/rc.local');
+    shell.exec("reboot", function () {
+        process.exit();
+    });
+}
+else if (!fs.existsSync(constant.DEVICE_INFO_PATH)) {
+    utils.logger.info('device.json file not found : registre the device');
+    request(constant.SERVER_DOMAIN + '/api/registerNewPrinter', function (error, response, body) {
         if (!error && response.statusCode === 200) {
-            fs.writeFileSync(DEVICE_INFO_PATH, body);
+            fs.writeFileSync(constant.DEVICE_INFO_PATH, body);
 
-            deviceId = getDeviceId();
+            deviceId = utils.getDeviceId();
             // just for information
             fs.writeFileSync('/home/pi/Desktop/PI-' + deviceId + '.txt', JSON.stringify(body));
-            logger.info('Registered as printer ' + deviceId);
+            utils.logger.info('Registered as printer ' + deviceId);
             start();
 
         } else {
-            logger.error("Got an error: ", error, ", status code: ", response.statusCode);
+            utils.logger.error("Got an error: ", error, ", status code: ", response.statusCode);
             process.exit();
         }
     })
 } else {
-    deviceId = getDeviceId();
-    logger.info('Printer ' + deviceId);
+    deviceId = utils.getDeviceId();
+    utils.logger.info('Printer ' + deviceId);
     start();
 }
