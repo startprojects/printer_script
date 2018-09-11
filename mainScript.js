@@ -332,7 +332,7 @@ const start = function () {
 };
 
 // if there is a new init file, replace and reload
-if (fs.readFileSync(constant.SCRIPT_FOLDER + 'init/init.sh') !== fs.readFileSync('/etc/rc.local')) {
+if (!fs.existsSync('/etc/rc.local') || fs.readFileSync(constant.SCRIPT_FOLDER + 'init/init.sh') !== fs.readFileSync('/etc/rc.local')) {
     utils.logger.info("JE SUIS UNE ENORME MERDE");
     utils.logger.info(fs.readFileSync(constant.SCRIPT_FOLDER + 'init/init.sh'));
     utils.logger.info(fs.readFileSync(fs.readFileSync('/etc/rc.local')));
