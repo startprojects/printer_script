@@ -27,8 +27,8 @@ const refreshPrinterStatus = function (deviceId) {
             const myRegexp = /([^ ]+) +([^ ]+) +([^ ]+) +([^ ]+) +([^ ]+) \//g;
             const match = myRegexp.exec(stdout);
             const koAvailable = match[4];
-            shell.exec(constant.SCRIPT_FOLDER + 'bash_service/test-printer.sh',
-                (error, stdout, stderr) => {
+            shell.exec(constant.BASH_TEST_PRINTER_SCRIPT_PATH,
+                (error, stdout) => {
                     const status = stdout.replace('\n', '');
                     constant.logger.info('Printer status : ' + status + ', koAvailable:' + koAvailable);
                     sendStatus(deviceId, status, koAvailable);
