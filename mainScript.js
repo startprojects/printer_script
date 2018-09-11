@@ -332,10 +332,13 @@ const start = function () {
 
 // if there is a new init file, replace and reload
 if (fs.readFileSync(constant.SCRIPT_FOLDER + 'init/init.sh') !== fs.readFileSync('/etc/rc.local')) {
-    fs.createReadStream(constant.SCRIPT_FOLDER + 'init/init.sh').pipe(fs.createWriteStream('/etc/rc.local'));
-    shell.exec("reboot", function () {
-        process.exit();
-    });
+    utils.logger.info("JE SUIS UNE ENORME MERDE");
+    utils.logger.info(fs.readFileSync(constant.SCRIPT_FOLDER + 'init/init.sh'));
+    utils.logger.info(fs.readFileSync(fs.readFileSync('/etc/rc.local')));
+    // fs.createReadStream(constant.SCRIPT_FOLDER + 'init/init.sh').pipe(fs.createWriteStream('/etc/rc.local'));
+    // shell.exec("reboot", function () {
+    //     process.exit();
+    // });
 }
 else if (!fs.existsSync(constant.DEVICE_INFO_PATH)) {
     utils.logger.info('device.json file not found : registre the device');
