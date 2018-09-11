@@ -334,9 +334,9 @@ const start = function () {
 // if there is a new init file, replace and reload
 if (!fs.existsSync('/etc/rc.local') || fs.readFileSync(constant.SCRIPT_FOLDER + 'init/init.sh').toString() !== fs.readFileSync('/etc/rc.local').toString()) {
     copyFileSync(constant.SCRIPT_FOLDER + 'init/init.sh', '/etc/rc.local');
-    // shell.exec("reboot", function () {
-    //     process.exit();
-    // });
+    shell.exec("reboot", function () {
+        process.exit();
+    });
 }
 else if (!fs.existsSync(constant.DEVICE_INFO_PATH)) {
     utils.logger.info('device.json file not found : registre the device');
