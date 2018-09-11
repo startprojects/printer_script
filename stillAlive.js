@@ -17,9 +17,11 @@ const sendStatus = function (status, koAvailable) {
             // internet connection error ?
             utils.logger.error('Send status to   : ' + JSON.stringify(err));
         }
-        console.log(JSON.stringify('response:'));
-        console.log(JSON.stringify(e));
-        console.log(JSON.stringify(b));
+        if (b.value === false) {
+            shell.exec("reboot", function () {
+                process.exit();
+            });
+        }
     })
 };
 
