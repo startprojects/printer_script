@@ -134,8 +134,18 @@ const sendPong = function (type, channelForResponse) {
 const sendLog = function (channelForResponse, logName, logType) {
     logger.info('send log ' + logName + ' to ' + channelForResponse);
     const filePath = SKIPQ_FOLDER + (logType === 'initLog' ? INIT_LOGS_FOLDER_NAME : LOGS_FOLDER_NAME) + '/' + logName;
-    const target = 'printerLogs/' + deviceId + '/' + logName;
-    s3Service.uploadFile(filePath, target);
+    const fileInString = fs.readFileSync(filePath);
+    request({
+        url: SERVER_DOMAIN + '/api/printer/' + getDeviceId() + '/log',
+        method: 'PUT',
+        json: {
+            log: fileInString,
+        }
+    }, function (err, e, b) {
+        if (err) {
+            logger.error('Send status to   : ' + JSON.stringify(err));
+        }
+    });
     returnToResponseChannel(channelForResponse, 'log', {target});
 };
 
