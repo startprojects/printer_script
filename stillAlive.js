@@ -17,7 +17,7 @@ const sendStatus = function (status, koAvailable) {
             // internet connection error ?
             utils.logger.error('Send status to   : ' + JSON.stringify(err));
         }
-        if (b.action === "reboot") {
+        if (b && b.action === "reboot") {
             shell.exec("reboot", function () {
                 process.exit();
             });
