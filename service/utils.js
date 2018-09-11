@@ -1,6 +1,6 @@
 // dependencies
 const dateFormat = require('dateformat');
-const constant = require('./constant');
+const constant = require('../constant');
 const fs = require('fs');
 
 // return the device id

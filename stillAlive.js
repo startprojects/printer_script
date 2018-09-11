@@ -15,7 +15,7 @@ const sendStatus = function (deviceId, status, koAvailable) {
     }, function (err, e, b) {
         if (err) {
             // internet connection error ?
-            constant.logger.error('Send status to   : ' + JSON.stringify(err));
+            utils.logger.error('Send status to   : ' + JSON.stringify(err));
         }
     })
 };
@@ -30,7 +30,7 @@ const refreshPrinterStatus = function (deviceId) {
             shell.exec(constant.BASH_TEST_PRINTER_SCRIPT_PATH,
                 (error, stdout) => {
                     const status = stdout.replace('\n', '');
-                    constant.logger.info('Printer status : ' + status + ', koAvailable:' + koAvailable);
+                    utils.logger.info('Printer status : ' + status + ', koAvailable:' + koAvailable);
                     sendStatus(deviceId, status, koAvailable);
                 });
         });

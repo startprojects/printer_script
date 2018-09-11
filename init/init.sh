@@ -53,8 +53,8 @@ LOG_PATH="${FOLDER_PATH}logs/$DATE.log"
 echo "Start script with log $LOG_PATH"
 sudo touch "$LOG_PATH"
 sudo chmod 777 "$LOG_PATH"
-nodejs "$SCRIPT_FOLDER_PATH/stillAlive.js" &
-nodejs "$SCRIPT_FOLDER_PATH/mainScript.js" > "$LOG_PATH"
+nodejs "${SCRIPT_FOLDER_PATH}stillAlive.js" &
+nodejs "${SCRIPT_FOLDER_PATH}mainScript.js" > "$LOG_PATH"
 
 
 exit 0
