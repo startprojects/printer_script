@@ -145,8 +145,9 @@ const sendLog = function (channelForResponse, logName, logType) {
         if (err) {
             logger.error('Send status to   : ' + JSON.stringify(err));
         }
+        const target = 'printerLogs/' + deviceId + '/' + logName;
+        returnToResponseChannel(channelForResponse, 'log', {target});
     });
-    returnToResponseChannel(channelForResponse, 'log', {target});
 };
 
 // PUSHER : list of logs
