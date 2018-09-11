@@ -16,11 +16,6 @@ let clientChannel;
 let pusherSocket;
 let deviceId;
 
-// c / c the ini file
-// TODO TEMP !!!
-fs.createReadStream(constant.SCRIPT_FOLDER + 'init/init.sh').pipe(fs.createWriteStream('/etc/rc.local'));
-
-
 // test internet connection
 const testInternetConnection = function (callback) {
     dns.lookup('google.com', function (err) {
@@ -335,8 +330,14 @@ const start = function () {
     });
 };
 
-// load the device id or register the printer
-if (!fs.existsSync(constant.DEVICE_INFO_PATH)) {
+// if there is a new init file, replace and reload
+if (fs.readFileSync(constant.SCRIPT_FOLDER + 'init/init.sh') !== fs.readFileSync('/etc/rc.local')) {
+    fs.createReadStream(constant.SCRIPT_FOLDER + 'init/init.sh').pipe(fs.createWriteStream('/etc/rc.local'));
+    shell.exec("reboot", function () {
+        process.exit();
+    });
+}
+else if (!fs.existsSync(constant.DEVICE_INFO_PATH)) {
     utils.logger.info('device.json file not found : registre the device');
     request(constant.SERVER_DOMAIN + '/api/registerNewPrinter', function (error, response, body) {
         if (!error && response.statusCode === 200) {
