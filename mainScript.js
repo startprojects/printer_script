@@ -7,6 +7,7 @@ const SCRIPT_INFO_PATH = SCRIPT_FOLDER + 'info.json';
 const SERVER_DOMAIN = 'https://order.skip-q.com';
 const TICKETS_FOLDER_NAME = 'ticketToPrint';
 const LOGS_FOLDER_NAME = 'logs';
+const INIT_LOGS_FOLDER_NAME = 'init_logs';
 
 
 // dependencies
@@ -130,9 +131,9 @@ const sendPong = function (type, channelForResponse) {
 };
 
 // PUSHER : log
-const sendLog = function (channelForResponse, logName) {
+const sendLog = function (channelForResponse, logName, logType) {
     logger.info('send log ' + logName + ' to ' + channelForResponse);
-    const filePath = SKIPQ_FOLDER + LOGS_FOLDER_NAME + '/' + logName;
+    const filePath = SKIPQ_FOLDER + (logType === 'initLog' ? INIT_LOGS_FOLDER_NAME : LOGS_FOLDER_NAME) + '/' + logName;
     const target = 'printerLogs/' + deviceId + '/' + logName;
     s3Service.uploadFile(filePath, target);
     returnToResponseChannel(channelForResponse, 'log', {target});
@@ -145,9 +146,16 @@ const sendLogs = function (channelForResponse) {
             const arr = _.filter(stdout.split("\n"), (name) => {
                 return name && name.length > 2;
             });
-            returnToResponseChannel(channelForResponse, 'list logs', 'list', {
-                logs: arr,
-            });
+            shell.exec('ls -1 ' + SKIPQ_FOLDER + INIT_LOGS_FOLDER_NAME,
+                (error2, stdout2) => {
+                    const arr2 = _.filter(stdout2.split("\n"), (name) => {
+                        return name && name.length > 2;
+                    });
+                    returnToResponseChannel(channelForResponse, 'list logs', 'list', {
+                        logs: arr,
+                        initLogs: arr2,
+                    });
+                });
         });
 };
 
@@ -267,7 +275,7 @@ const pusherListener = function (channel) {
                 sendLogs(data.channelForResponse);
                 break;
             case 'send_log':
-                sendLog(data.channelForResponse, data.logName);
+                sendLog(data.channelForResponse, data.logName, data.logType);
                 break;
             case 'reboot':
                 shell.exec("reboot", function (error, stdout, stderr) {

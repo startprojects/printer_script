@@ -11,10 +11,6 @@ function getClient() {
             s3RetryDelay: 1000, // this is the default
             multipartUploadThreshold: 20971520, // this is the default (20 MB)
             multipartUploadSize: 15728640, // this is the default (15 MB)
-            s3Options: {
-                accessKeyId: "AKIAJPRTXQPQA7RDVGWQ",
-                secretAccessKey: "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",
-            },
         });
     }
     return client;
@@ -26,7 +22,7 @@ exports.uploadFile = function (sourcePath, target) {
     const uploader = getClient().uploadFile({
         localFile: sourcePath,
         s3Params: {
-            Bucket: "skipqprivate",
+            Bucket: "skipqdata",
             Key: target,
         },
     });
