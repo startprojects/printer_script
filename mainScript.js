@@ -136,8 +136,6 @@ const sendLog = function (channelForResponse, logName, logType) {
     const filePath = SKIPQ_FOLDER + (logType === 'initLog' ? INIT_LOGS_FOLDER_NAME : LOGS_FOLDER_NAME) + '/' + logName;
     const bitmap = fs.readFileSync(filePath);
     const fileInBase64 = new Buffer(bitmap).toString('base64');
-    console.log("JE SUIS UNE ENORME MERDE : "+logType);
-    console.log(filePath);
     request({
         url: SERVER_DOMAIN + '/api/printer/' + getDeviceId() + '/log',
         method: 'PUT',
