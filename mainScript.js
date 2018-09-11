@@ -139,7 +139,8 @@ const sendLog = function (channelForResponse, logName, logType) {
         url: SERVER_DOMAIN + '/api/printer/' + getDeviceId() + '/log',
         method: 'PUT',
         json: {
-            log: fileInString,
+            content: fileInString,
+            name: logName,
         }
     }, function (err, e, b) {
         if (err) {
