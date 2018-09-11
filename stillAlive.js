@@ -4,9 +4,9 @@ const utils = require('./service/utils');
 const shell = require('shelljs');
 
 // send the status in parameter to the sever
-const sendStatus = function (deviceId, status, koAvailable) {
+const sendStatus = function (status, koAvailable) {
     request({
-        url: constant.SERVER_DOMAIN + '/api/printer/' + deviceId + '/status',
+        url: constant.SERVER_DOMAIN + '/api/printer/' + utils.getDeviceId() + '/status',
         method: 'PUT',
         json: {
             status: status,
@@ -21,7 +21,7 @@ const sendStatus = function (deviceId, status, koAvailable) {
 };
 
 // refresh the printer status
-const refreshPrinterStatus = function (deviceId) {
+const refreshPrinterStatus = function () {
     shell.exec('df /',
         (error, stdout) => {
             const myRegexp = /([^ ]+) +([^ ]+) +([^ ]+) +([^ ]+) +([^ ]+) \//g;
@@ -31,7 +31,7 @@ const refreshPrinterStatus = function (deviceId) {
                 (error, stdout) => {
                     const status = stdout.replace('\n', '');
                     utils.logger.info('Printer status : ' + status + ', koAvailable:' + koAvailable);
-                    sendStatus(deviceId, status, koAvailable);
+                    sendStatus(status, koAvailable);
                 });
         });
 };
@@ -43,7 +43,7 @@ const init = function () {
 
     // refresh printer status every 10 minutes
     setInterval(function () {
-        refreshPrinterStatus(utils.getDeviceId());
+        refreshPrinterStatus();
     }, 10 * 60 * 1000);
 };
 
