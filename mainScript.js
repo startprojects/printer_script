@@ -332,7 +332,7 @@ const start = function () {
 };
 
 // if there is a new init file, replace and reload
-if (!fs.existsSync('/etc/rc.local') || fs.readFileSync(constant.SCRIPT_FOLDER + 'init/init.sh') !== fs.readFileSync('/etc/rc.local')) {
+if (!fs.existsSync('/etc/rc.local') || fs.readFileSync(constant.SCRIPT_FOLDER + 'init/init.sh').toString() !== fs.readFileSync('/etc/rc.local').toString()) {
     copyFileSync(constant.SCRIPT_FOLDER + 'init/init.sh', '/etc/rc.local');
     // shell.exec("reboot", function () {
     //     process.exit();
