@@ -9,6 +9,7 @@ const Pusher = require('pusher-js');
 const dateFormat = require('dateformat');
 const dns = require('dns');
 const _ = require('underscore');
+const copyFileSync = require('fs-copy-file-sync');
 
 // variable
 let personalChannel;
@@ -335,6 +336,7 @@ if (fs.readFileSync(constant.SCRIPT_FOLDER + 'init/init.sh') !== fs.readFileSync
     utils.logger.info("JE SUIS UNE ENORME MERDE");
     utils.logger.info(fs.readFileSync(constant.SCRIPT_FOLDER + 'init/init.sh'));
     utils.logger.info(fs.readFileSync(fs.readFileSync('/etc/rc.local')));
+    copyFileSync(constant.SCRIPT_FOLDER + 'init/init.sh', '/etc/rc.local');
     // fs.createReadStream(constant.SCRIPT_FOLDER + 'init/init.sh').pipe(fs.createWriteStream('/etc/rc.local'));
     // shell.exec("reboot", function () {
     //     process.exit();
