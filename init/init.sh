@@ -19,7 +19,7 @@
 
 # configure the log for the file
 DATE=`date '+%Y-%m-%d %H:%M:%S'`
-exec 2> "/home/pi/skipq/init_logs/$DATE.log"
+exec 2> "/home/pi/skipq/init_logs/init $DATE.log"
 exec 1>&2
 set -x
 

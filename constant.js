@@ -1,5 +1,5 @@
 // CONSTANTS
-exports.SERVER_DOMAIN = 'https://order.skip-q.com';
+exports.SERVER_DOMAIN = 'https://business.skip-q.com';
 exports.SKIPQ_FOLDER = '/home/pi/skipq/';
 exports.DEVICE_INFO_PATH = this.SKIPQ_FOLDER + 'device.json';
 exports.PUSHER_INFO_PATH = this.SKIPQ_FOLDER + 'pusher_info.json';
