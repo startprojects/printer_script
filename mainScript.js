@@ -156,7 +156,7 @@ const printOrder = function (name, printTaskId, base64Ticket) {
                         }
                         else {
                             attempt++;
-                            if (attempt > 4) {
+                            if (attempt === 4) {
                                 // after 2 minutes, change the status but continue the loop
                                 sendPrintResult(printTaskId, 'FAILED : PRINTER OFF');
                             }
