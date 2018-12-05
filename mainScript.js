@@ -152,7 +152,7 @@ const sendLogs = function (channelForResponse) {
 const printOrder = function (name, printTaskId, base64Ticket) {
     sendPrintResult(printTaskId, 'ORDER RECEIVED');
     // control if the ticket is already exists : do nothing if already present in the tickets folder
-    if (isTicketAlreadyExists(constant.TICKETS_FOLDER_PATH + '/' + name)) {
+    if (isTicketAlreadyExists(name)) {
         sendPrintResult(printTaskId, 'ORDER ALREADY RECEIVED : DO NOT TAKE IN CARE');
         return;
     }
