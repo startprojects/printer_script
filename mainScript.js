@@ -25,11 +25,22 @@ const testInternetConnection = function (callback) {
 };
 
 // convert string to file
-const getFileFromBase64 = function (path, base64, promise) {
+const saveFileFromBase64 = function (path, base64, promise) {
     // TODO clean file to avoid too much ticket ?
     fs.writeFile(path, base64, {encoding: 'base64'}, function () {
         promise();
     });
+};
+
+// convert string to file
+const isTicketAlreadyExists = function (startPath) {
+    var files = fs.readdirSync(constant.TICKETS_FOLDER_PATH + '/');
+    for (let i = 0; i < files.length; i++) {
+        if (files[i].indexOf(startPath) === 0) {
+            return true;
+        }
+    }
+    return false;
 };
 
 // return info to the specified channel
@@ -140,10 +151,15 @@ const sendLogs = function (channelForResponse) {
 // PUSHER : print
 const printOrder = function (name, printTaskId, base64Ticket) {
     sendPrintResult(printTaskId, 'ORDER RECEIVED');
+    // control if the ticket is already exists : do nothing if already present in the tickets folder
+    if (isTicketAlreadyExists(name)) {
+        sendPrintResult(printTaskId, 'ORDER ALREADY RECEIVED : DO NOT TAKE IN CARE');
+        return;
+    }
     const time = dateFormat(new Date(), 'yyyy-mm-dd HH:MM:ss');
     const fileName = constant.TICKETS_FOLDER_PATH + '/' + name + ' - ' + time + '.pdf';
     utils.logger.info('Try to print order  ' + fileName);
-    getFileFromBase64(fileName, base64Ticket, () => {
+    saveFileFromBase64(fileName, base64Ticket, () => {
         print(fileName, (printReference) => {
             if (printTaskId) {
                 utils.logger.info('Test print result for  ' + printReference + ' / ' + printTaskId);
