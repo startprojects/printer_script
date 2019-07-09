@@ -33,7 +33,7 @@ counter=0
 while :;
 do
     wget -q --spider http://github.com
-    if [[ $? -eq 0 ]]
+    if [ $? -eq 0 ]
     then
 		echo 'ok'
         break
