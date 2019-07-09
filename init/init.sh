@@ -32,8 +32,8 @@ GIT_SCRIPT_FOLDER_PATH="$SCRIPT_FOLDER_PATH.git"
 counter=0
 while :;
 do
-    wget -q --spider http://github.com
-    if [ $? -eq 0 ]
+    is_internet_connection="$(wget -q --spider http://github.com > /dev/null && echo ok || echo error)"
+    if [ $is_internet_connection = "ok" ]
     then
 		echo 'ok'
         break
