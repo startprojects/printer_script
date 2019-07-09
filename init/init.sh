@@ -19,7 +19,7 @@
 
 # configure the log for the file
 DATE=`date '+%Y-%m-%d %H:%M:%S'`
-exec 2> "/home/pi/skipq/init_logs/init $DATE.log"
+exec 2> "/home/pi/skipq/init_logs/$DATE.log"
 exec 1>&2
 set -x
 
@@ -32,8 +32,8 @@ GIT_SCRIPT_FOLDER_PATH="$SCRIPT_FOLDER_PATH.git"
 counter=0
 while :;
 do
-    is_internet_connection="$(ping -q -w1 -c1 github.com &>/dev/null && echo ok || echo error)"
-    if [ $is_internet_connection = "ok" ]
+    wget -q --spider http://github.com
+    if [[ $? -eq 0 ]]
     then
 		echo 'ok'
         break
@@ -53,8 +53,7 @@ LOG_PATH="${FOLDER_PATH}logs/$DATE.log"
 echo "Start script with log $LOG_PATH"
 sudo touch "$LOG_PATH"
 sudo chmod 777 "$LOG_PATH"
-nodejs "${SCRIPT_FOLDER_PATH}stillAlive.js" &
-nodejs "${SCRIPT_FOLDER_PATH}mainScript.js" > "$LOG_PATH"
+node "$SCRIPT_FOLDER_PATH/mainScript.js" > "$LOG_PATH"
 
 
 exit 0
