@@ -32,7 +32,7 @@ GIT_SCRIPT_FOLDER_PATH="$SCRIPT_FOLDER_PATH.git"
 counter=0
 while :;
 do
-    is_internet_connection="$(ping -q -w 1 -c 1 `ip r | grep default | cut -d ' ' -f 3` > /dev/null && echo ok || echo error)"
+    is_internet_connection="$(ping -q -w1 -c1 google.com &>/dev/null && echo ok || echo error)"
     if [ $is_internet_connection = "ok" ]
     then
 		echo 'ok'
