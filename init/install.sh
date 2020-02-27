@@ -13,13 +13,15 @@
 # configure :
 # install printer tool
 sudo apt-get update
-sudo apt-get  install cups-client
+sudo apt-get install cups-client -y
 # !!! wrong printer version : the task are remove when there is no paper into the printer
 # follow this tutorial  : https://www.hmazter.com/2013/05/raspberry-pi-printer-server-for-labelwriter/
 # define printer as main printer
 lpadmin -d DYMO_LabelWriter_450
 # install node
-sudo apt-get install nodejs
+sudo curl https://raw.githubusercontent.com/nvm-sh/nvm/v0.34.0/install.sh | bash
+source ~/.bashrc
+sudo nvm install 6
 
 # confirgure the timzone
 sudo timedatectl set-timezone Europe/Brussels
@@ -38,7 +40,7 @@ mkdir /home/pi/skipq/ticketToPrint
 mkdir /home/pi/skipq/init_logs
 
 # install network-manager
-sudo apt-get install network-manager
+sudo apt-get install network-manager -y
 
 # init alexandre iphone network
 # nmcli dev wifi connect 'Alexandre de Pret iPhone' password vgal8855
