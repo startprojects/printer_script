@@ -29,7 +29,7 @@ sudo timedatectl set-timezone Europe/Brussels
 # clone the repo then switch to the branch
 git clone https://github.com/SkipQ/printer_script.git /home/pi/skipq/script
 cd /home/pi/skipq/script/ && git fetch
-cd /home/pi/skipq/script/ && git checkout deploy
+cd /home/pi/skipq/script/ && git checkout deploy-prod
 
 # 3. replace /etc/rc.local by init.sh
 sudo cp /home/pi/skipq/script/init/init.sh /etc/rc.local
