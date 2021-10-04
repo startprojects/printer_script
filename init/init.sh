@@ -58,6 +58,8 @@ sudo chmod 777 "$LOG_PATH"
 # nvm
 curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
 
+export XDG_CONFIG_HOME=/home/pi/.config
+
 export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s
 "/home/pi/.nvm" || sudo printf %s "${XDG_CONFIG_HOME}/nvm")"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
