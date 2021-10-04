@@ -53,6 +53,24 @@ LOG_PATH="${FOLDER_PATH}logs/$DATE.log"
 echo "Start script with log $LOG_PATH"
 sudo touch "$LOG_PATH"
 sudo chmod 777 "$LOG_PATH"
+
+
+# nvm
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s
+"${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+
+nvm install 10
+
+nvm alias default 10
+
+nvm use 10
+
+node -v
+
+
 node "$SCRIPT_FOLDER_PATH/stillAlive.js" &
 node "$SCRIPT_FOLDER_PATH/mainScript.js" > "$LOG_PATH"
 
