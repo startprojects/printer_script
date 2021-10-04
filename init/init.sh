@@ -64,11 +64,11 @@ export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s
 "/home/pi/.nvm" || sudo printf %s "${XDG_CONFIG_HOME}/nvm")"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
 
-$XDG_CONFIG_HOME/nvm/nvm.sh install 10
+sudo $XDG_CONFIG_HOME/nvm/nvm.sh install 10
 
-$XDG_CONFIG_HOME/nvm/nvm.sh alias default 10
+sudo $XDG_CONFIG_HOME/nvm/nvm.sh alias default 10
 
-$XDG_CONFIG_HOME/nvm/nvm.sh use 10
+sudo $XDG_CONFIG_HOME/nvm/nvm.sh use 10
 
 node -v
 
